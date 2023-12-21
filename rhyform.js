@@ -81,7 +81,7 @@ var rhyform = (function() {
             anim = new Animation(0, inSeconds*2, inSeconds, 30, animateImmediately = false, animOptions=animationOptions)
             return anim;
 
-        } else if (element instanceof Text) {
+        } else if (element instanceof Text || element instanceof Button || element instanceof ValueSlider) {
             
             htmlAnimationOptions = {
                 "propertiesAtStart": {
@@ -171,7 +171,7 @@ var rhyform = (function() {
             anim = new Animation(0, inSeconds*2, inSeconds, 30, animateImmediately = false, animOptions=animationOptions)
             return anim;
 
-        } else if (element instanceof Text) {
+        } else if (element instanceof Text || element instanceof Button || element instanceof ValueSlider) {
             
             htmlAnimationOptions = {
                 "propertiesAtStart": {
@@ -224,6 +224,15 @@ var rhyform = (function() {
         }
 
         
+    }
+
+    function moveToTopViewX(viewXElement) {
+        // viewX.moveToTop(graphname, elementname)
+
+        // element: viewXElement.name
+        // graph: viewXElement.space.name + "-graph"
+        
+        viewX.moveToTop(viewXElement.space.name + "-graph", viewXElement.name)
     }
 
 
@@ -552,6 +561,35 @@ var rhyform = (function() {
         });
     }
 
+    function manageTags(tagName, object, action) {
+        if (action === 'add') {
+            // Add the tag if it doesn't exist
+            if (object.tags.indexOf(tagName) === -1) {
+                object.tags.push(tagName);
+                // Update the global tag registry
+                if (rhyform && rhyform.tags) {
+                    rhyform.tags[tagName] = rhyform.tags[tagName] || [];
+                    rhyform.tags[tagName].push(object);
+                }
+            }
+        } else if (action === 'remove') {
+            // Remove the tag if it exists
+            var index = object.tags.indexOf(tagName);
+            if (index !== -1) {
+                object.tags.splice(index, 1);
+                // Update the global tag registry
+                if (rhyform && rhyform.tags && rhyform.tags[tagName]) {
+                    var tagIndex = rhyform.tags[tagName].indexOf(object);
+                    if (tagIndex !== -1) {
+                        rhyform.tags[tagName].splice(tagIndex, 1);
+                    }
+                }
+            }
+        }
+
+        return object;
+    }
+    
 
 
 
@@ -598,7 +636,10 @@ var rhyform = (function() {
 
         this.element.style.position = 'relative';
         this.element.style.display = 'block';
+        this.element.style.width = '100%';
+
         this.svgLayer.style.position = 'relative';
+        this.svgLayer.style.width = '100%';
 
         this.htmlLayer = document.createElement("div");
         this.htmlLayer.setAttribute("id", spaceName + "-html-layer");
@@ -633,6 +674,247 @@ var rhyform = (function() {
 
         rhyform.selectActiveScene(this);
 
+        
+        this.resetToFrame = function(animationIndex) {
+
+            if (this.resetting == false || this.resetting == undefined) {
+                this.resetting = true;
+                this.resettingData = {};
+                // const sceneElements = rhyform.tags["<scene>" + this.name] || [];
+                // console.log(sceneElements)
+
+                // console.log(this)
+                this.pause();
+                
+                this.animationIndices = Object.keys(this.animations);
+
+                // this.resetScene = new Scene(sceneName = this.name + "-reset")
+                // rhyform.activeScene = this.resetScene;
+
+                // for (let element of sceneElements) {
+                //     if (element != this.seekBar) {
+                //         // element.hide(inSeconds=0.001);
+                        
+                //     }
+                // }
+
+                // this.resetScene.play();
+
+                for (let i = this.animationIndex; i >= 0; i--) {
+                    this.animation = this.animations[this.animationIndices[i]];
+
+                    // console.log(this.name, i, 'backward')
+
+                    if (this.animation.type == 'viewX') {
+                        // console.log("Rewind")
+
+                        // this.resettingData.frames = viewX.animationData[this.animation.name][1].keyframes
+
+                        // this.resettingData.frameKeys = Object.keys(this.resettingData.frames)
+
+                        viewX.setAnimationFrame(this.animation.name, 0);
+                    }
+                    else if (this.animation.type == 'html-css-style') {
+                        // console.log("re-css")
+                        // console.log(this.animation.animationOptions)
+                        
+                        this.resettingData.transitionString = ""
+                        for (var property in animation.animationOptions.propertiesAtStart) {
+                            this.resettingData.transitionString += property + " 0s, ";
+                        }
+
+                        this.animation.animationOptions.element.style.transition = this.resettingData.transitionString.slice(0, -2);
+
+                        if (this.animation.animationOptions.element != this.seekBar) {
+                            for (var property in this.animation.animationOptions.propertiesAtStart) {
+                                this.animation.animationOptions.element.style[property] = this.animation.animationOptions.propertiesAtStart[property];
+                            }
+                        }
+
+                        // transitionString = ""
+
+                        // endHasOpacity = false;
+
+                        // for (var property in animation.animationOptions.propertiesAtEnd) {
+                        //     transitionString += property + " " + animation.duration + "s, ";
+
+                        //     if (property == 'opacity') {
+                        //         endHasOpacity = true;
+                        //     }
+
+                        // }
+                        
+                        // animation.animationOptions.element.style.transition = transitionString.slice(0, -2);
+
+                        // if (animation.animationOptions.element != this.seekBar) {
+                        //     for (var property in animation.animationOptions.propertiesAtEnd) {
+                        //         animation.animationOptions.element.style[property] = animation.animationOptions.propertiesAtEnd[property];
+
+                        //         console.log(animation.animationOptions.element.innerText, property, animation.animationOptions.propertiesAtEnd[property])
+                        //     }
+                        // }
+
+                        // if (endHasOpacity) {
+                        //     opacityValue = animation.animationOptions.propertiesAtEnd['opacity'];
+                        //     if (opacityValue == 0) {
+                        //         animation.animationOptions.element.style.pointerEvents = 'none';
+                        //     }
+                        //     else {
+                        //         animation.animationOptions.element.style.pointerEvents = 'auto';
+                        //     }
+                        // }
+                    }
+                    else if (this.animation.type == 'inner-html') {
+                        
+                        // console.log("re-html")
+                        if (this.animation.animationOptions.text != undefined) {
+                            this.animation.animationOptions.element.innerHTML = "";
+                        }
+
+                    }
+                    // else if (animation.type == 'audio') {
+                    //     if (animation.animationOptions.action == 'play') {
+                    //         from = animation.animationOptions.from;
+
+                    //         if (from == undefined) {
+                    //             from = 0;
+                    //         }
+
+                    //         animation.animationOptions.element.currentTime = from;
+                    //         animation.animationOptions.element.play();
+                    //     }
+                    //     else if (animation.animationOptions.action == 'pause') {
+                    //         animation.animationOptions.element.pause();
+                    //     }
+                    //     else if (animation.animationOptions.action == 'stop') {
+                    //         animation.animationOptions.element.pause();
+                    //         animation.animationOptions.element.currentTime = 0;
+                    //     }
+                    // }
+                    // else if (animation.type == 'wait') {
+                    //     // do nothing
+                    // }
+                }
+
+
+                for (let i = 0; i < animationIndex; i++) {
+                    this.animation = this.animations[this.animationIndices[i]];
+                    
+                    // console.log(this.name, i, 'forward')
+
+                    if (this.animation.type == 'viewX') {
+                        // console.log(viewX.animationData[this.animation.name][1])
+                         this.resettingData.frames = viewX.animationData[this.animation.name][1].keyframes
+
+                        this.resettingData.frameKeys = Object.keys(this.resettingData.frames)
+
+                        // convert keys to numbers from strings
+
+                        keysAsNumbers = []
+                        for (let key of this.resettingData.frameKeys) {
+                            keysAsNumbers.push(parseFloat(key))
+                        }
+
+                        // get max key
+
+                        keysAsNumbers.sort(function(a, b){return b-a});
+
+                        viewX.setAnimationFrame(this.animation.name, keysAsNumbers[0]);
+                    }
+                    else if (this.animation.type == 'html-css-style') {
+                        // console.log("css")
+                        // console.log(this.animation.animationOptions)
+                        
+                        // transitionString = ""
+                        // for (var property in animation.animationOptions.propertiesAtStart) {
+                        //     transitionString += property + " 0s, ";
+                        // }
+
+                        // animation.animationOptions.element.style.transition = transitionString.slice(0, -2);
+                        // if (animation.animationOptions.element != this.seekBar) {
+                        //     for (var property in animation.animationOptions.propertiesAtStart) {
+                        //         animation.animationOptions.element.style[property] = animation.animationOptions.propertiesAtStart[property];
+                        //     }
+                        // }
+
+                        // transitionString = ""
+
+                        // endHasOpacity = false;
+
+                        // for (var property in animation.animationOptions.propertiesAtEnd) {
+                        //     transitionString += property + " " + animation.duration + "s, ";
+
+                        //     if (property == 'opacity') {
+                        //         endHasOpacity = true;
+                        //     }
+
+                        // }
+                        
+                        // animation.animationOptions.element.style.transition = transitionString.slice(0, -2);
+
+                        if (this.animation.animationOptions.element != this.seekBar) {
+                            for (var property in this.animation.animationOptions.propertiesAtEnd) {
+                                this.animation.animationOptions.element.style[property] = this.animation.animationOptions.propertiesAtEnd[property];
+
+                                console.log(this.animation.animationOptions.element.innerText, property, this.animation.animationOptions.propertiesAtEnd[property])
+                            }
+                        }
+
+                        // if (endHasOpacity) {
+                        //     opacityValue = animation.animationOptions.propertiesAtEnd['opacity'];
+                        //     if (opacityValue == 0) {
+                        //         animation.animationOptions.element.style.pointerEvents = 'none';
+                        //     }
+                        //     else {
+                        //         animation.animationOptions.element.style.pointerEvents = 'auto';
+                        //     }
+                        // }
+                    }
+                    else if (this.animation.type == 'inner-html') {
+                        // console.log("html")
+                        if (this.animation.animationOptions.text != undefined) {
+                            this.animation.animationOptions.element.innerHTML = this.animation.animationOptions.text;
+                        }
+
+                    }
+                    // else if (animation.type == 'audio') {
+                    //     if (animation.animationOptions.action == 'play') {
+                    //         from = animation.animationOptions.from;
+
+                    //         if (from == undefined) {
+                    //             from = 0;
+                    //         }
+
+                    //         animation.animationOptions.element.currentTime = from;
+                    //         animation.animationOptions.element.play();
+                    //     }
+                    //     else if (animation.animationOptions.action == 'pause') {
+                    //         animation.animationOptions.element.pause();
+                    //     }
+                    //     else if (animation.animationOptions.action == 'stop') {
+                    //         animation.animationOptions.element.pause();
+                    //         animation.animationOptions.element.currentTime = 0;
+                    //     }
+                    // }
+                    // else if (animation.type == 'wait') {
+                    //     // do nothing
+                    // }
+                }
+
+                // animationKey = this.animationIndices[animationIndex]
+                // animation = this.animations[animationKey];
+
+                // console.log(animation)
+
+                this.animationIndex = animationIndex;
+                // this.playAnimation(animationIndex);
+
+                this.resetting = false;
+
+        
+            }
+        }
+
         this.playGroupAnimation = function(animationGroup) {
             animationFromGroup = animationGroup.list[animationGroup.animationIndex]
 
@@ -660,6 +942,9 @@ var rhyform = (function() {
                     animationFromGroup.animationOptions.element.innerHTML = animationFromGroup.animationOptions.text;
                 }
             }
+            else if (animationFromGroup.type == 'function') {
+                animationFromGroup.animationOptions.function();
+            }
 
             animationGroup.animationIndex += 1;
 
@@ -685,45 +970,95 @@ var rhyform = (function() {
         }
 
         this.playAnimation = function(animationIndex) {
-            animationKey = this.animationIndices[animationIndex]
-            animation = this.animations[animationKey];
+            this.currentAnimationKey = this.animationIndices[animationIndex]
+            this.currentAnimation = this.animations[ this.currentAnimationKey];
 
-            console.log(this.animationIndex)
+            // console.log(this.animationIndex, this.name)
 
-            // console.log(animation.animationOptions.elementsAndPropertiesInvolved)
-            for (var elementName in animation.animationOptions.elementsAndPropertiesInvolved) {
-                animationElementPropString = JSON.stringify([elementName, animation.animationOptions.elementsAndPropertiesInvolved[elementName]['properties']]);
+            if (this.seekBar != null) {
+                
+                // get approximate time of animation
+
+                timeOfAnimation = 0;
+                ignoreNext = false;
+                for (var i = 0; i < animationIndex; i++) {
+                    if (!ignoreNext) {
+                        timeOfAnimation += this.animations[this.animationIndices[i]].duration;
+                    }
+
+                    if (this.animations[this.animationIndices[i]].animateNextImmediately) {
+                        ignoreNext = true;
+                    }
+                    else {
+                        ignoreNext = false;
+                    }
+                }
+
+                maxDuration = 0;
+
+                
+                ignoreNext = false;
+
+                for (var i = 0; i < this.animationIndices.length; i++) {
+                    if (!ignoreNext) {
+                        maxDuration += this.animations[this.animationIndices[i]].duration;
+                    }
+
+                    if (this.animations[this.animationIndices[i]].animateNextImmediately) {
+                        ignoreNext = true;
+                    }
+                    else {
+                        ignoreNext = false;
+                    }
+
+                }
+
+                this.seekBar.timeOfAnimation = timeOfAnimation;
+                this.seekBar.maxDuration = maxDuration;
+
+                this.seekBar.max = this.animationIndices.length;
+                this.seekBar.value = animationIndex + 1;
+
+
+
+
+                this.seekBar.updateSlider();
+            }
+
+            // console.log(this.currentAnimation, this.name, animationIndex, this)
+            for (var elementName in this.currentAnimation.animationOptions.elementsAndPropertiesInvolved) {
+                animationElementPropString = JSON.stringify([elementName, this.currentAnimation.animationOptions.elementsAndPropertiesInvolved[elementName]['properties']]);
                 this.animatingElementsAndProperties[animationElementPropString] = 'animating'
             }
             
-            animation.scene = this;
+            this.currentAnimation.scene = this;
             
-            if (!animation.animateNextImmediately && this.animationIndex > 1) {
-                this.atTime += animation.duration;
+            if (!this.currentAnimation.animateNextImmediately && this.animationIndex > 1) {
+                this.atTime += this.currentAnimation.duration;
             }
 
-            if (animation.type == 'viewX') {
-                viewX.playAnimation(animation.name, animation.start, animation.end, animation.duration, animation.fps);
+            if (this.currentAnimation.type == 'viewX') {
+                viewX.playAnimation(this.currentAnimation.name, this.currentAnimation.start, this.currentAnimation.end, this.currentAnimation.duration, this.currentAnimation.fps);
             }
-            else if (animation.type == 'html-css-style') {
+            else if (this.currentAnimation.type == 'html-css-style') {
 
                 transitionString = ""
-                for (var property in animation.animationOptions.propertiesAtStart) {
+                for (var property in this.currentAnimation.animationOptions.propertiesAtStart) {
                     transitionString += property + " 0s, ";
                 }
 
-                animation.animationOptions.element.style.transition = transitionString.slice(0, -2);
+                this.currentAnimation.animationOptions.element.style.transition = transitionString.slice(0, -2);
                 
-                for (var property in animation.animationOptions.propertiesAtStart) {
-                    animation.animationOptions.element.style[property] = animation.animationOptions.propertiesAtStart[property];
+                for (var property in this.currentAnimation.animationOptions.propertiesAtStart) {
+                    this.currentAnimation.animationOptions.element.style[property] = this.currentAnimation.animationOptions.propertiesAtStart[property];
                 }
 
                 transitionString = ""
 
                 endHasOpacity = false;
 
-                for (var property in animation.animationOptions.propertiesAtEnd) {
-                    transitionString += property + " " + animation.duration + "s, ";
+                for (var property in this.currentAnimation.animationOptions.propertiesAtEnd) {
+                    transitionString += property + " " + this.currentAnimation.duration + "s, ";
 
                     if (property == 'opacity') {
                         endHasOpacity = true;
@@ -731,50 +1066,54 @@ var rhyform = (function() {
 
                 }
                 
-                animation.animationOptions.element.style.transition = transitionString.slice(0, -2);
+                this.currentAnimation.animationOptions.element.style.transition = transitionString.slice(0, -2);
 
-                for (var property in animation.animationOptions.propertiesAtEnd) {
-                    animation.animationOptions.element.style[property] = animation.animationOptions.propertiesAtEnd[property];
+                for (var property in this.currentAnimation.animationOptions.propertiesAtEnd) {
+                    this.currentAnimation.animationOptions.element.style[property] = this.currentAnimation.animationOptions.propertiesAtEnd[property];
                 }
 
                 if (endHasOpacity) {
-                    opacityValue = animation.animationOptions.propertiesAtEnd['opacity'];
+                    opacityValue = this.currentAnimation.animationOptions.propertiesAtEnd['opacity'];
                     if (opacityValue == 0) {
-                        animation.animationOptions.element.style.pointerEvents = 'none';
+                        this.currentAnimation.animationOptions.element.style.pointerEvents = 'none';
                     }
                     else {
-                        animation.animationOptions.element.style.pointerEvents = 'auto';
+                        this.currentAnimation.animationOptions.element.style.pointerEvents = 'auto';
                     }
                 }
             }
-            else if (animation.type == 'inner-html') {
+            else if (this.currentAnimation.type == 'inner-html') {
                 
-                if (animation.animationOptions.text != undefined) {
-                    animation.animationOptions.element.innerHTML = animation.animationOptions.text;
+                if (this.currentAnimation.animationOptions.text != undefined) {
+                    this.currentAnimation.animationOptions.element.innerHTML = this.currentAnimation.animationOptions.text;
+                    MathJax.typeset([this.currentAnimation.animationOptions.element])
                 }
 
             }
-            else if (animation.type == 'audio') {
-                if (animation.animationOptions.action == 'play') {
-                    from = animation.animationOptions.from;
+            else if (this.currentAnimation.type == 'audio') {
+                if (this.currentAnimation.animationOptions.action == 'play') {
+                    from = this.currentAnimation.animationOptions.from;
 
                     if (from == undefined) {
                         from = 0;
                     }
 
-                    animation.animationOptions.element.currentTime = from;
-                    animation.animationOptions.element.play();
+                    this.currentAnimation.animationOptions.element.currentTime = from;
+                    this.currentAnimation.animationOptions.element.play();
                 }
-                else if (animation.animationOptions.action == 'pause') {
-                    animation.animationOptions.element.pause();
+                else if (this.currentAnimation.animationOptions.action == 'pause') {
+                    this.currentAnimation.animationOptions.element.pause();
                 }
-                else if (animation.animationOptions.action == 'stop') {
-                    animation.animationOptions.element.pause();
-                    animation.animationOptions.element.currentTime = 0;
+                else if (this.currentAnimation.animationOptions.action == 'stop') {
+                    this.currentAnimation.animationOptions.element.pause();
+                    this.currentAnimation.animationOptions.element.currentTime = 0;
                 }
             }
-            else if (animation.type == 'wait') {
+            else if (this.currentAnimation.type == 'wait') {
                 // do nothing
+            }
+            else if (this.currentAnimation.type == 'function') {
+                this.currentAnimation.animationOptions.function();
             }
 
 
@@ -784,14 +1123,14 @@ var rhyform = (function() {
             
 
             if (this.animationIndex < this.animationIndices.length) {
-                (function(animation, viewX, self) {
+                (function(currentAnimation, viewX, self) {
 
-                    if (animation.animateNextImmediately) {
-                        if (animation.beginsAGroup) {
-                            animation.group.animationIndex = 0;
+                    if (currentAnimation.animateNextImmediately) {
+                        if (currentAnimation.beginsAGroup) {
+                            currentAnimation.group.animationIndex = 0;
                             
-                            self.playGroupAnimation(animation.group);
-                            self.playAnimation(self.animationIndex + animation.group.list.length - 1);
+                            self.playGroupAnimation(currentAnimation.group);
+                            self.playAnimation(self.animationIndex + currentAnimation.group.list.length - 1);
                         }
                         else {
                             self.playAnimation(self.animationIndex);
@@ -801,23 +1140,23 @@ var rhyform = (function() {
                     else {
                         self.nextFrameTimeout = setTimeout(function() {
                             self.playAnimation(self.animationIndex);
-                        }, animation.duration*1000);
+                        }, currentAnimation.duration*1000);
                     }
 
                     
-                })(animation, viewX, this);
+                })(this.currentAnimation, viewX, this);
             }
 
 
         }
 
-        this.play = function() {
+        this.play = function(from=0) {
             this.atTime = 0;
             this.animationIndex = 0;
 
             this.animationIndices = Object.keys(this.animations);
 
-            this.playAnimation(0);
+            this.playAnimation(from);
         }
 
         this.pause = function() {
@@ -851,6 +1190,148 @@ var rhyform = (function() {
             return pauseState;
             
         }
+
+
+        this.clear = function() {
+            this.pause();
+            this.animationIndex = 0;
+            this.animations = {};
+            this.animationIndices = [];
+            this.animatingElementsAndProperties = {};
+            this.audioAdditionIndex = 0;
+            this.animationAdditionIndex = 0;
+            this.atTime = 0;
+            this.seekBar = null;
+        }
+
+        this.createSeekBar = function() {
+
+            // const defaults = {
+            //     at: {x: 0, y: 0, z: 0},
+            //     width: 5,
+            //     min: 0,
+            //     max: 100,
+            //     value: 50,
+            //     step: 1,
+            //     sliderProperties: {
+            //         onChange: function(){ console.log("Slider value changed"); },
+            //         color: "white",
+            //         thickness: 0.2,
+            //         isAlwaysVisible: false,
+            //         backgroundType: 'glassy',
+            //         borderColor: 'hsla(0, 0%, 50%, 0.1)'
+            //     },
+            //     valueDisplayProperties: {
+            //         color: "white",
+            //         fontSize: "xxx-large",
+            //         font: "Gaegu"
+            //     },
+            //     labelTextProperties: {
+            //         color: "hsla(0, 0%, 70%, 1)",
+            //         fontSize: 'auto',
+            //         font: "Gaegu",
+            //         text: "Temperature"
+            //     },
+            //     labelDescriptionProperties: {
+            //         color: "hsla(0, 0%, 40%, 1)",
+            //         fontSize: 'small',
+            //         font: "Gaegu",
+            //         text: "The value represents the change in some quantity that is important to this visualization. Maybe it's the number of people in a room, or the amount of money in a bank account or number of stars in a galaxy ⭐️."
+            //     }
+            // };
+
+            sliderOptions = {
+                at: {x: -8, y: -8},
+                min: 0,
+                max: Object.keys(this.animations).length,
+                value: this.animationAdditionIndex,
+                width: 17,
+                step: 1,
+                labelTextProperties: {
+                    text: '',
+                },
+                labelDescriptionProperties: {
+                    text: '',
+                },
+                valueDisplayProperties: {
+                    fontSize: 'medium',
+                    color: 'grey'
+                },
+                sliderProperties: {
+                    forScene: this,
+                    onChange: async function() {
+                        if (this.forScene.resetting == false || this.forScene.resetting == undefined) {
+
+                            this.forScene.pause();
+                            // this.forScene.animationIndex = this.forScene.seekBar.value - 1;
+                            if (this.forScene.seekBar.value > 1) {
+                                this.forScene.resetToFrame(this.forScene.seekBar.value - 1);
+                                this.forScene.playAnimation(this.forScene.seekBar.value - 1);
+                            }
+                            else if (this.forScene.seekBar.value == 1) {
+                                this.forScene.resetToFrame(0);
+                                this.forScene.playAnimation(0);
+
+                            }
+                        }
+                    },
+                    valueTransformToText: function(value) {
+
+                        // seconds to hours, minutes, seconds
+
+
+                        hours = Math.floor(this.forScene.seekBar.timeOfAnimation/3600);
+                        minutes = Math.floor((this.forScene.seekBar.timeOfAnimation - hours*3600)/60);
+                        seconds = this.forScene.seekBar.timeOfAnimation - hours*3600 - minutes*60;
+
+                        if (hours < 10) {
+                            hours = "0" + hours.toString();
+                        }
+                        if (minutes < 10) {
+                            minutes = "0" + minutes.toString();
+                        }
+
+                        if (seconds < 10) {
+                            seconds = "0" + seconds.toFixed(1).toString();
+                        }
+                        else {
+                            seconds = seconds.toFixed(1).toString();
+                        }
+                        finalString = ""
+                        
+                        if (hours != "00") {
+                            finalString += hours + ":";
+                        }
+
+                        finalString += minutes + ":" + seconds;
+                        
+
+                        // console.log(hours, minutes, seconds)
+
+                        return finalString;
+                    },
+                    isAlwaysVisible: true,
+                    borderColor: 'transparent',
+                    thickness: 2,
+                    backgroundType: 'none',
+                    trackColor: 'hsla(198, 0%, 10%, 0.1)',
+                    trackFillColor: 'hsla(198, 70%, 30%, 0.5)',
+                    thumbSize: 10,
+                    thumbColor: 'hsla(198, 30%, 70%, 1)',
+                }
+            }
+
+            
+        
+
+
+            this.seekBar = rhyform.createSlider(sliderOptions);
+            this.seekBar.scene = this;
+
+            return this.seekBar;
+        }
+
+        
     }
 
     
@@ -862,9 +1343,22 @@ var rhyform = (function() {
 
     function Point(at={x:0, y:0, z:0}, size=0.5, color="white") {
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
         this.coordinates = at;
 
         this.space = rhyform.activeScene.selectedSpace;
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
         this.name = "point-" + rhyform.objectAdditionIndex;
         this.size = size;
         this.color = color;
@@ -943,6 +1437,21 @@ var rhyform = (function() {
  
             at: (x=0, y=0, z=0) => {
                 this.coordinates = {x: x, y: y, z: z};
+                this.bounds = {
+                    xmin: this.coordinates.x,
+                    xmax: this.coordinates.x,
+                    ymin: this.coordinates.y,
+                    ymax: this.coordinates.y,
+                    zmin: this.coordinates.z,
+                    zmax: this.coordinates.z,
+                }
+
+                this.bounds.center = {
+                    x: this.coordinates.x,
+                    y: this.coordinates.y,
+                    z: this.coordinates.z,
+                }
+
                 this.updatePointRender();
                 return this;
             },
@@ -971,8 +1480,28 @@ var rhyform = (function() {
                 if (atDistance === undefined) {
                     atDistance = this.space.camera.labelDistance;
                 }
+
+
+
+
                 this.coordinates.y = element.bounds.ymin - atDistance;
                 this.coordinates.x = element.bounds.center.x;
+
+                this.bounds = {
+                    xmin: this.coordinates.x,
+                    xmax: this.coordinates.x,
+                    ymin: this.coordinates.y,
+                    ymax: this.coordinates.y,
+                    zmin: this.coordinates.z,
+                    zmax: this.coordinates.z,
+                }
+
+                this.bounds.center = {
+                    x: this.coordinates.x,
+                    y: this.coordinates.y,
+                    z: this.coordinates.z,
+                }
+
                 this.updatePointRender();
                 return this;
             },
@@ -1057,19 +1586,33 @@ var rhyform = (function() {
         };
 
 
+        this.moveToTop = function() {
+            moveToTopViewX(this);
+        }
+
+        this.remove = function() {
+            viewX.removePoint(this.space.name + "-graph", this.name);
+        }
+
 
     }
-
-    Point.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
 
     function Text(content) {
         this.content = content;
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
 
         this.added = false;
         this.element = null;
@@ -1215,6 +1758,7 @@ var rhyform = (function() {
 
             content: (content, inSeconds=1) => {
                 this.content = content;
+                
                 htmlAnimationOptions = {
                     "text": this.content,
                     "speed": 1,
@@ -1231,6 +1775,7 @@ var rhyform = (function() {
                 }
                 
                 anim = new Animation(0, animationDurationFactor, animationDurationFactor, 50, animateImmediately = false, animOptions=htmlAnimationOptions, type="inner-html")
+
 
                 return anim;
             },
@@ -1279,6 +1824,8 @@ var rhyform = (function() {
             }
         }
 
+
+
         this.findHeightAndBounds = function(element) {
             if (element instanceof Text) {
                 element.height = element.element.clientHeight/this.space.camera.pixelsPerUnit;
@@ -1295,6 +1842,8 @@ var rhyform = (function() {
             
             at: (x=0, y=0, z=0) => {
                 this.coordinates = {x: x, y: y, z: z};
+
+
                 this.placeAtCoordinates();
                 return this;
             },
@@ -1418,7 +1967,9 @@ var rhyform = (function() {
                 this.element.style.textAlign = this.textAlign;
                 return this;
             }
-        };  
+        }; 
+        
+        this.set = this.loadWith;
 
 
         this.write = function(lettersPerSecond=20) {
@@ -1554,19 +2105,40 @@ var rhyform = (function() {
             return theAnim;
         }
 
+        this.remove = function() {
+            
+            // console.log(this.element.innerHTML)
+            // remove the html element from div
+            if (this.element.parentNode != null) {
+                this.element.outerHTML = "";
+            }
+            else {
+                this.element.remove();
+            }
+            // this.element.parentNode.removeChild(this.element);
+            // console.log(this.element)
+            
+        }
+
 
     }
-    
-    Text.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
-
+ 
     function Button(content, onClick) {
         this.content = content;
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
 
         buttonText = new Text(content);
         this.textObject = buttonText;
@@ -1634,18 +2206,14 @@ var rhyform = (function() {
 
         this.setClick(onClick);
 
-
+        this.remove = function() {
+            this.textObject.remove();
+        }
 
         return this;
         
     }
 
-    Button.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
 
     function Gradient(at=[{color: "white", position: 0}, {color: "black", position: 1}], direction="horizontal") {
         this.at = at;
@@ -1677,6 +2245,20 @@ var rhyform = (function() {
         this.space = rhyform.activeScene.selectedSpace;
         this.name = "line-" + rhyform.objectAdditionIndex;
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
+
         this.point1 = between[0];
         this.point2 = between[1];
 
@@ -1724,6 +2306,12 @@ var rhyform = (function() {
 
             updatingLineData = {x1:this.point1.coordinates.x, y1:this.point1.coordinates.y, x2:this.point2.coordinates.x, y2:this.point2.coordinates.y, strokewidth: this.thickness, linecolor: this.color}
             updatingLine = viewX.updateLine(this.space.name + "-graph", this.name, updatingLineData)
+        }
+
+
+        
+        this.moveToTop = function() {
+            moveToTopViewX(this);
         }
         
 
@@ -2011,15 +2599,12 @@ var rhyform = (function() {
                 anim = new Animation(0, inSeconds*1.8, inSeconds, 30, animateImmediately = false, animOptions=animationOptions)
                 return anim;
             },
+        };
+
+        this.remove = function() {
+            viewX.removeLine(this.space.name + "-graph", this.name)
         }
     }
-
-    Line.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
 
     function Curve(points=[], thickness=0.2, color="white", fillcolor="none") {
         
@@ -2027,6 +2612,18 @@ var rhyform = (function() {
         this.name = "curve-" + rhyform.objectAdditionIndex;
         this.tags = [];
         
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
 
         if (points[0].command != null) {
             this.points = points;
@@ -2106,7 +2703,7 @@ var rhyform = (function() {
 
 
        
-
+        
         this.thickness = thickness;
         this.color = color;
         this.fillColor = fillcolor;
@@ -2142,17 +2739,19 @@ var rhyform = (function() {
         };
 
         this.show = function(inSeconds=1) {
+            this.updateCurve();
             theAnim = showElement(this, inSeconds);
             return theAnim;
         }
 
         this.hide = function(inSeconds=1) {
+            this.updateCurve();
             theAnim = hideElement(this, inSeconds);
             return theAnim;
         }
 
 
-        this.draw = function(inSeconds=1) {
+        this.draw = function(pointsPerSecond=10) {
             this.updateCurve();
             if (this.points[0].command != null) {
                 distanceBetweenPoints = 0;
@@ -2192,7 +2791,12 @@ var rhyform = (function() {
                 return anim;
             }
             else {
+                distanceBetweenPoints = 0;
+                for (i=0; i<this.points.length-1; i++) {
+                    distanceBetweenPoints += rhyform.libraryFunctions.distanceBetweenPoints(this.points[i], this.points[i+1])
+                }
 
+                inSeconds = distanceBetweenPoints / pointsPerSecond
 
                 animationOptions = {}
                 animationOptions.keyframes = {}
@@ -2357,18 +2961,48 @@ var rhyform = (function() {
                 this.pointsXY = points; 
                 return theAnim;
             },
+
+            color: (color, inSeconds=1) => {
+                theAnim = changeViewXProperties(this, {pathcolor: this.color}, {pathcolor: color}, inSeconds);
+                this.color = color;
+                return theAnim;
+            },
+
+            fillColor: (color, inSeconds=1) => {
+                theAnim = changeViewXProperties(this, {pathfillcolor: this.fillColor}, {pathfillcolor: color}, inSeconds);
+                this.fillColor = color;
+                return theAnim;
+            }
+        }
+
+        
+        this.moveToTop = function() {
+            moveToTopViewX(this);
+        }
+
+        this.remove = function() {
+            viewX.removePath(this.space.name + "-graph", this.name)
         }
     }
 
-    Curve.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
 
     function Circle(at=point, radius=1) {
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
+
+
         this.coordinates = at;
 
         this.space = rhyform.activeScene.selectedSpace;
@@ -2534,6 +3168,27 @@ var rhyform = (function() {
                 }
 
                 return this;
+            },
+
+            radius: (radius) => {
+                this.radius = radius;
+
+                this.bounds = {
+                    xmin: this.center.coordinates.x - this.radius,
+                    xmax: this.center.coordinates.x + this.radius,
+                    ymin: this.center.coordinates.y - this.radius,
+                    ymax: this.center.coordinates.y + this.radius,
+                    zmin: this.center.coordinates.z - this.radius,
+                    zmax: this.center.coordinates.z + this.radius,
+                }
+
+                this.bounds.center = {
+                    x: this.center.coordinates.x,
+                    y: this.center.coordinates.y,
+                    z: this.center.coordinates.z,
+                }
+
+                return this;
             }
         };
 
@@ -2561,16 +3216,405 @@ var rhyform = (function() {
 
         };
 
+        
+        this.moveToTop = function() {
+            moveToTopViewX(this);
+        }
 
+        this.remove = function() {
+            viewX.removeCircle(this.space.name + "-graph", this.name)
+        }
 
     }
 
-    Circle.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
+
+
+    function ValueSlider(at={x:0, y:0, z:0}, width=5, min=0, max=100, value=50, step=1, sliderProperties={onChange:function(){console.log("Slider value changed")}, 
+    valueTransformToText: function(value) {return value;}, thumbSize: 10, thumbColor: "hsla(198, 100% 60%, 1)", trackColor: "hsla(198, 0%, 0%, 0.4)", trackFillColor: "hsla(198, 100%, 40%, 1)",  thickness: 10, isAlwaysVisible: false, backgroundType:'glassy', borderColor:'hsla(0, 0%, 40%, 0.1)'}, valueDisplayProperties={color: "white", fontSize: "large", font: "Nunito"},  labelTextProperties={color: "white", fontSize: 'auto', font: "Nunito", text: ""}, labelDescriptionProperties={color: "white", fontSize: 'small', font: "Nunito", text: ""}) {
+        this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
+
+        this.coordinates = at;
+
+        this.space = rhyform.activeScene.selectedSpace;
+        this.name = "valueSlider-" + rhyform.objectAdditionIndex;
+        this.sliderProperties = sliderProperties;
+        this.valueDisplayProperties = valueDisplayProperties;
+        this.labelTextProperties = labelTextProperties;
+        this.labelDescriptionProperties = labelDescriptionProperties;
+        this.width = width;
+        this.height = 1;
+        this.min = min;
+        this.max = max;
+        this.value = value;
+        this.step = step;
+        this.sliderVisible = true;
+
+
+        this.bounds = {
+            xmin: this.coordinates.x,
+            xmax: this.coordinates.x + this.width,
+            ymin: this.coordinates.y ,
+            ymax: this.coordinates.y,
+            zmin: this.coordinates.z,
+            zmax:  this.coordinates.z,
+        }
+
+        this.bounds.center = {
+            x: this.coordinates.x,
+            y: this.coordinates.y,
+            z: this.coordinates.z,
+        }
+
+        this.added = false;
+        this.element = null;
+
+        this.createBasicSlider = function() {
+            if (!this.added) {
+
+                // <div class="pt-3 ng-scope" ng-repeat="(nodeParameterKey, nodeParameter) in networkGraph.nodes[networkGraph.selectedNode].parameters">
+                //     <span class="parameter-display-text ng-binding" ng-click="nodeParameter.editing = !nodeParameter.editing">0.035</span>
+                //     <i class="ml-2 fa fa-pencil sub-addition-button" ng-click="nodeParameter.editing = !nodeParameter.editing"></i>
+                //     <div class="pb-2" ng-show="nodeParameter.editing">
+                //         <input type="range" id="node-slider-recoveryRate" min="0" max="0.3" step="0.001" ng-model="nodeParameter.value" ng-change="networkGraph.changingNodeParameter()" class="ng-untouched ng-valid ng-not-empty ng-dirty ng-valid-parse ng-valid-min ng-valid-max ng-valid-step">
+                //     </div>
+                //     <div class="text-ignus ng-binding" style="font-size: normal;">
+                //         Recovery Rate
+                //     </div>
+                //     <div class="text-ignus ng-binding" style="font-size: x-small; color: gray;">
+                //         The rate at which the node recovers from the disease
+                //     </div>
+                // </div>
+
+                // get name with spaces removed and lower cased, it should be a copy
+                var idName = this.name.replace(/\s/g, '').toLowerCase();
+
+                styleToAdd = `
+                #` + idName + `-rhyform-slider-editToggle-button  {
+                    color: hsla(0, 0%, 100%, 0.3);
+                }
+
+                #` + idName + `-rhyform-slider-editToggle-button:hover {
+                    color: white;
+                }
+
+                #` + idName + `-rhyform-slider-glassy {
+                    background-color: hsla(0, 0%, 10%, 0.4);
+                    backdrop-filter: blur(3px);
+                }
+
+
+                @media screen and (-webkit-min-device-pixel-ratio:0) {
+                    #` + idName + `-rhyform-slider-input[type='range'] {
+                        background-color: hsla(0, 0%, 100%, 0.2);
+                        border-radius: 5px;
+                        cursor: pointer;
+                        padding:  ` + this.sliderProperties.thickness/2 + `px 0;
+                    }
+
+                                
+                    #` + idName + `-rhyform-slider-input[type='range']::-webkit-slider-runnable-track {
+                        -webkit-appearance: none;
+                        height: 0px;
+                        color: black;
+                        margin-top: -10px;
+                    }
+                    
+                    
+                    #` + idName + `-rhyform-slider-input[type='range']::-webkit-slider-thumb {
+                        width: ` + this.sliderProperties.thumbSize + `px;
+                        height: ` + this.sliderProperties.thumbSize + `px;
+                        cursor: ew-resize;
+                        background: hsla(198, 100%, 50%, 0);
+                        box-shadow: -1001px 0px 0px 1000px ` + this.sliderProperties.trackFillColor + `;
+                        margin-top: -5px;
+                    }
+
+                    #` + idName + `-rhyform-design-slider-input[type='range'] {
+                        background-color: ` + this.sliderProperties.trackColor + `;
+                        border-radius: 5px;
+                        padding:  ` + this.sliderProperties.thickness/2 + `px 0;
+                    }
+                    
+                    #` + idName + `-rhyform-design-slider-input[type='range']::-webkit-slider-runnable-track {
+                        height: 0px;
+                        color: black;
+                        margin-top: -10px;
+                    }
+                    
+                    #` + idName + `-rhyform-design-slider-input[type='range']::-webkit-slider-thumb {
+                        width: ` + this.sliderProperties.thumbSize + `px;
+                        height: ` + this.sliderProperties.thumbSize + `px;
+                        cursor: ew-resize;
+                        background: ` + this.sliderProperties.thumbColor + `;
+                        box-shadow: 0px 0px 0px 0px hsla(198, 100%, 70%, 0);
+                        margin-top: ` + (-1*(this.sliderProperties.thumbSize - 10)/2) + `px;
+                    }
+
+                }
+
+                @supports (-moz-appearance:none) {
+                    #` + idName + `-rhyform-slider-input[type='range'] {
+                        background-color: hsla(0, 0%, 100%, 0);
+                        border-radius: 5px;
+                        padding: 5px 0;
+                    }
+
+                    #` + idName + `-rhyform-design-slider-input[type='range'] {
+                        background-color: hsla(0, 0%, 100%, 0);
+                        border-radius: 5px;
+                        padding: 5px 0;
+                    }
+                }
+
+                #` + idName + `-rhyform-slider-input[type="range"]::-moz-range-progress {
+                    background-color: ` + this.sliderProperties.trackFillColor + `; 
+                }
+                #` + idName + `-rhyform-slider-input[type="range"]::-moz-range-track {  
+                    background-color: ` + this.sliderProperties.trackColor + `;
+                }
+
+                #` + idName + `-rhyform-slider-input[type="range"]::-ms-fill-lower {
+                    background-color: ` + this.sliderProperties.trackFillColor + `; 
+                }
+                #` + idName + `-rhyform-slider-input[type="range"]::-ms-fill-upper {  
+                    background-color: ` + this.sliderProperties.trackColor + `;
+                }
+                `
+
+                var style = document.createElement("style");
+                style.id = idName + "-rhyform-slider-styles";
+                style.type = "text/css";
+
+                if (style.styleSheet) {
+                    style.styleSheet.cssText = styleToAdd;
+                } else {
+                    style.appendChild(document.createTextNode(styleToAdd));
+                }
+
+                document.getElementById("rhyform-slider-styles").appendChild(style);
+
+
+                
+                var mainDiv = document.createElement("div");
+                mainDiv.id = this.name;
+                mainDiv.style.position = "absolute";
+                // add class pt-3
+                mainDiv.classList.add("p-3");
+                mainDiv.classList.add("p-md-4")
+                
+                var valueDisplaySpan = document.createElement("span");
+                valueDisplaySpan.id = idName + "-value-display";
+                valueDisplaySpan.style.fontFamily = this.valueDisplayProperties.font;
+                valueDisplaySpan.style.fontSize = this.valueDisplayProperties.fontSize;
+                valueDisplaySpan.style.color = this.valueDisplayProperties.color;
+                valueDisplaySpan.innerHTML = this.sliderProperties.valueTransformToText(this.value);
+
+                mainDiv.appendChild(valueDisplaySpan);
+
+                mainDiv.style.zIndex = 5;
+
+                
+
+                if (!this.sliderProperties.isAlwaysVisible) {
+                    var editValueIcon = document.createElement("i");
+                    editValueIcon.id = idName + "-rhyform-slider-editToggle-button";
+                    editValueIcon.classList.add("ml-2");
+                    editValueIcon.classList.add("fa");
+                    editValueIcon.classList.add("fa-pencil");
+                    editValueIcon.classList.add("rhyform-slider-editToggle-button");
+                    editValueIcon.onclick = () => {
+                        this.sliderVisible = !this.sliderVisible;
+                        this.updateSliderVisibility();
+                    }
+
+                    mainDiv.appendChild(editValueIcon);
+
+                    
+                }
+
+
+                var sliderDiv = document.createElement("div");
+                // add class pb-1
+                sliderDiv.classList.add("pb-1");
+                sliderDiv.classList.add("mb-4");
+                sliderDiv.classList.add("pr-4");
+                sliderDiv.style.position = "relative"; 
+
+                this.sliderDiv = sliderDiv;
+
+                var sliderInput = document.createElement("input");
+                sliderInput.type = "range";
+                sliderInput.min = this.min;
+                sliderInput.max = this.max;
+                sliderInput.step = this.step;
+                sliderInput.value = this.value;
+                sliderInput.id = idName + "-rhyform-slider-input";
+                sliderInput.style.width = '100%';
+
+                sliderDiv.appendChild(sliderInput);
+                mainDiv.appendChild(sliderDiv);
+
+                sliderInput.oninput = () => {
+                    this.value = sliderInput.value;
+                    valueDisplaySpan.innerHTML = this.sliderProperties.valueTransformToText(this.value);
+
+                    designSliderInput.value = this.value;
+                    this.sliderProperties.onChange();
+                }
+
+                sliderInput.onchange = sliderInput.oninput;
+
+                
+                sliderInput.classList.add("rhyform-slider-input");
+                sliderInput.style.position = "absolute";
+
+                var designSliderInput = document.createElement("input");
+                designSliderInput.type = "range";
+                designSliderInput.min = this.min;
+                designSliderInput.max = this.max;
+                designSliderInput.step = this.step;
+                designSliderInput.value = this.value;
+                designSliderInput.id = idName + "-rhyform-design-slider-input";
+                designSliderInput.style.width = '100%';
+                designSliderInput.classList.add("rhyform-design-slider-input");
+                designSliderInput.style.pointerEvents = "none";
+
+                sliderDiv.appendChild(designSliderInput);
+                designSliderInput.style.position = "absolute";
+
+
+                if (this.sliderVisible) {
+                    sliderDiv.style.display = "block";
+                }
+
+                if (this.labelTextProperties.text != "") {
+                
+                    var labelTextDiv = document.createElement("div");
+                    labelTextDiv.id = this.name + "-label-text";
+                    labelTextDiv.style.fontFamily = this.labelTextProperties.font;
+                    labelTextDiv.style.fontSize = this.labelTextProperties.fontSize;
+                    labelTextDiv.style.color = this.labelTextProperties.color;
+                    labelTextDiv.innerHTML = this.labelTextProperties.text;
+
+                    mainDiv.appendChild(labelTextDiv);
+                }
+
+                if (this.labelDescriptionProperties.text != "") {
+
+                    var labelDescriptionDiv = document.createElement("div");
+                    labelDescriptionDiv.id = this.name + "-label-description";
+                    labelDescriptionDiv.style.fontFamily = this.labelDescriptionProperties.font;
+                    labelDescriptionDiv.style.fontSize = this.labelDescriptionProperties.fontSize;
+                    labelDescriptionDiv.style.color = this.labelDescriptionProperties.color;
+                    labelDescriptionDiv.innerHTML = this.labelDescriptionProperties.text;
+
+                    mainDiv.appendChild(labelDescriptionDiv);
+                }
+
+               
+
+                
+                htmlCoordinates = viewX.getHTMLCoordinates(this.space.name + "-graph", this.coordinates.x, this.coordinates.y)
+
+                mainDiv.style.left = htmlCoordinates.x + "px";
+                mainDiv.style.top = htmlCoordinates.y + "px";
+
+                mainDiv.style.width = this.width*this.space.camera.pixelsPerUnit + "px";
+
+                document.getElementById(this.space.name + "-html-layer").appendChild(mainDiv);
+                mainDiv.style.opacity = 0;
+
+
+                
+
+                if (this.sliderProperties.backgroundType == "glassy") {
+                    mainDiv.classList.add("rhyform-slider-glassy");
+                }
+                else if (this.sliderProperties.backgroundType == "solid") {
+                    mainDiv.style.background = "rgba(0, 0, 0, 0.2)";
+                }
+
+                if (this.sliderProperties.borderColor != "none") {
+                    mainDiv.style.border = "2px solid " + this.sliderProperties.borderColor;
+                }
+
+                mainDiv.style.borderRadius = "10px";
+
+                MathJax.typeset([mainDiv])
+
+                this.added = true;
+                this.element = mainDiv;
+
+            }
+        }
+
+        this.updateSliderVisibility = function() {
+            if (this.sliderVisible) {
+                this.sliderDiv.style.display = "block";
+            }
+            else {
+                this.sliderDiv.style.display = "none";
+            }
+        }
+
+
+        this.updateSlider = function() {
+            if (!this.added) {
+                this.createBasicSlider();
+            }
+
+            idName = this.name.replace(/\s/g, '').toLowerCase();
+            this.element.querySelector("#" + idName + "-value-display").innerHTML = this.sliderProperties.valueTransformToText(this.value);
+
+            this.element.querySelector("#" + idName + "-rhyform-slider-input").min = this.min;
+            this.element.querySelector("#" + idName + "-rhyform-slider-input").max = this.max;
+            this.element.querySelector("#" + idName + "-rhyform-slider-input").step = this.step;
+
+            this.element.querySelector("#" + idName + "-rhyform-design-slider-input").min = this.min;
+            this.element.querySelector("#" + idName + "-rhyform-design-slider-input").max = this.max;
+            this.element.querySelector("#" + idName + "-rhyform-design-slider-input").step = this.step;
+
+            
+            this.element.querySelector("#" + idName + "-rhyform-slider-input").value = this.value;
+            this.element.querySelector("#" + idName + "-rhyform-design-slider-input").value = this.value;
+
+
+            this.updateSliderVisibility();
+
+
+        }
+
+
+
+        this.show = function(inSeconds=1) {
+            this.createBasicSlider();
+            theAnim = showElement(this, inSeconds);
+            return theAnim;
+        }
+
+        this.hide = function(inSeconds=1) {
+            // this.element.style.pointerEvents = "none";
+            theAnim = hideElement(this, inSeconds);
+            return theAnim;
+        }
+
         return this;
-    };
+
+
+    }
 
     function AnimationGroup() {
         this.list = [];
@@ -2594,10 +3638,11 @@ var rhyform = (function() {
         }
 
     }
+    
 
     function Animation(start=0, end=1, duration=1, fps=30, animateImmediately=false, animOptions={}, type="viewX") {
         
-        this.name = "animation-" + rhyform.activeScene.animationAdditionIndex;
+        this.name = "animation-" + rhyform.activeScene.animationAdditionIndex + "-forScene-" + rhyform.activeScene.name;
         this.start = start;
         this.end = end;
         this.duration = duration;
@@ -2629,6 +3674,10 @@ var rhyform = (function() {
             this.animationOptions = animOptions;
         }
 
+        if (type == 'function') {
+            this.animationOptions = animOptions;
+        }
+
 
         rhyform.activeScene.animations[this.name] = this;
         rhyform.activeScene.animationAdditionIndex += 1;
@@ -2649,6 +3698,21 @@ var rhyform = (function() {
         this.added = false;
         this.element = null;
         this.volume = 1;
+
+        this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
 
         this.createBasicAudio = function() {
             if (!this.added) {
@@ -2717,6 +3781,21 @@ var rhyform = (function() {
         this.space = rhyform.activeScene.selectedSpace;
         this.name = "equation-" + rhyform.objectAdditionIndex;
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+
+        
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
+
         this.expression = expression;
 
         
@@ -2980,19 +4059,34 @@ var rhyform = (function() {
                 return this;
             }
         };
+
+        this.remove = function() {
+            for (let curve of this.curves) {
+                curve.remove()
+            }
+        }
     }
 
-    Equation.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
+
 
     function VectorImage(url="none", at={x:0, y:0, z:0}, color="white", fillcolor="none",  width=1) {
         this.space = rhyform.activeScene.selectedSpace;
         this.name = "vectorImage-" + rhyform.objectAdditionIndex;
         this.tags = [];
+
+        this.addTag = function(tagName) {
+            manageTags(tagName, this, 'add');
+            return this;
+        }
+
+        this.removeTag = function(tagName) {
+            manageTags(tagName, this, 'remove');
+            return this;
+        }
+        
+        
+        this.scene = rhyform.activeScene;
+        this.addTag("<scene>" + this.scene.name)
 
         this.width = width;
 
@@ -3110,6 +4204,12 @@ var rhyform = (function() {
             return theAnim;
         }
 
+        this.draw = function(inSeconds=1) {
+            // console.log(this.curves[0])
+            this.curves[0].show().startNextImmediately();
+            this.curves[0].draw(inSeconds);
+        }
+
 
         this.change = {
             url: (url, inSeconds=1) => {
@@ -3208,16 +4308,14 @@ var rhyform = (function() {
             }
         }
 
+        this.remove = function() {
+            for (let curve of this.curves) {
+                curve.remove()
+            }
+        }
 
         return this.generateCurves()
     }
-
-    VectorImage.prototype.addTag = function(tag) {
-        this.tags.push(tag);
-        rhyform.tags[tag] = rhyform.tags[tag] || [];
-        rhyform.tags[tag].push(this);
-        return this;
-    };
 
 
     function hideShowTagGroup(type, tag, inSeconds=1) {
@@ -3287,7 +4385,7 @@ var rhyform = (function() {
                     properties: ['opacity']
                 }
 
-            } else if (element instanceof Text) {
+            } else if (element instanceof Text || element instanceof ValueSlider) {
 
                 // if (type == 0) {
                 //     element.element.style.pointerEvents = "none";
@@ -3411,6 +4509,7 @@ var rhyform = (function() {
 
     function styleToHead() {
         let style = document.createElement('style');
+        style.id = "rhyform-styles";
         style.type = 'text/css';
         style.innerHTML = `
         .rhyform-button {
@@ -3447,9 +4546,129 @@ var rhyform = (function() {
             color: black !important;
         }
 
+        .rhyform-slider-editToggle-button {
+            font-size: 12px;
+            cursor: pointer;
+            color: hsla(0, 0%, 100%, 0.3);
+        }
+
+        .rhyform-slider-editToggle-button:hover {
+            color: white;
+        }
+
+        .rhyform-slider-glassy {
+            background-color: hsla(0, 0%, 10%, 0.4);
+            backdrop-filter: blur(3px);
+        }
+
+
+        
+        /*Chrome*/
+        @media screen and (-webkit-min-device-pixel-ratio:0) {
+            .rhyform-slider-input[type='range'] {
+                overflow: hidden;
+                -webkit-appearance: none;
+                background-color: hsla(0, 0%, 100%, 0.2);
+                border-radius: 5px;
+                padding: 3px 0;
+            }
+            
+            .rhyform-slider-input[type='range']::-webkit-slider-runnable-track {
+                -webkit-appearance: none;
+                height: 0px;
+                width: 100%;
+                color: black;
+                margin-top: -10px;
+                border-radius: 50%;
+            }
+            
+            .rhyform-slider-input[type='range']::-webkit-slider-thumb {
+                width: 20px;
+                -webkit-appearance: none;
+                height: 20px;
+                cursor: ew-resize;
+                background: hsla(198, 100%, 50%, 0);
+                box-shadow: -1001px 0px 0px 1000px hsla(198, 100%, 50%, 1);
+                border-radius: 50%;
+                margin-top: -5px;
+                position: relative;
+            }
+
+            .rhyform-design-slider-input[type='range'] {
+                overflow: visible;
+                -webkit-appearance: none;
+                background-color: hsla(0, 0%, 100%, 0.2);
+                border-radius: 5px;
+                padding: 3px 0;
+            }
+            
+            .rhyform-design-slider-input[type='range']::-webkit-slider-runnable-track {
+                -webkit-appearance: none;
+                height: 0px;
+                width: 100%;
+                color: black;
+                margin-top: -10px;
+                border-radius: 50%;
+            }
+            
+            .rhyform-design-slider-input[type='range']::-webkit-slider-thumb {
+                width: 20px;
+                -webkit-appearance: none;
+                height: 20px;
+                cursor: ew-resize;
+                background: hsla(198, 100%, 70%, 1);
+                box-shadow: 0px 0px 0px 0px hsla(198, 100%, 70%, 0);
+                border-radius: 50%;
+                margin-top: -5px;
+                position: relative;
+            }
+
+        }
+
+        @supports (-moz-appearance:none) {
+            .rhyform-slider-input[type='range'] {
+                overflow: hidden;
+                -webkit-appearance: none;
+                background-color: hsla(0, 0%, 100%, 0);
+                border-radius: 5px;
+                padding: 5px 0;
+            }
+
+            .rhyform-design-slider-input[type='range'] {
+                overflow: hidden;
+                -webkit-appearance: none;
+                background-color: hsla(0, 0%, 100%, 0);
+                border-radius: 5px;
+                padding: 5px 0;
+            }
+          }
+          
+
+        /** FF*/
+        .rhyform-slider-input[type="range"]::-moz-range-progress {
+            background-color: hsla(198, 100%, 50%, 1); 
+        }
+        .rhyform-slider-input[type="range"]::-moz-range-track {  
+            background-color: hsla(0, 0%, 100%, 0.2);
+        }
+        /* IE*/
+        .rhyform-slider-input[type="range"]::-ms-fill-lower {
+            background-color: hsla(198, 100%, 50%, 1); 
+        }
+        .rhyform-slider-input[type="range"]::-ms-fill-upper {  
+            background-color: hsla(0, 0%, 100%, 0.2);
+        }
+
         `;  
 
         document.getElementsByTagName('head')[0].appendChild(style);
+
+
+        var sliderStylesDiv = document.createElement("div");
+        sliderStylesDiv.id = "rhyform-slider-styles";
+        sliderStylesDiv.style.display = "none";
+        document.body.appendChild(sliderStylesDiv);
+        
     }
 
     styleToHead()
@@ -3520,12 +4739,54 @@ var rhyform = (function() {
             return anim;
         },
 
+        runFunction : function(func, inSeconds=1) {
+            animOptions = {
+                "function": func
+            }
+            anim = new Animation(0, inSeconds, inSeconds, 30, animateImmediately = false, animOptions=animOptions, type="function")
+            return anim;
+        },
+
         showElementsWithTag: function(tag, inSeconds=1) {
             return hideShowTagGroup(1, tag, inSeconds)
         },
 
         hideElementsWithTag: function(tag, inSeconds=1) {
             return hideShowTagGroup(0, tag, inSeconds)
+        },
+
+        removeElementsWithTag: function(tag) {
+            const elements = rhyform.tags[tag] || [];
+
+            for (let element of elements) {
+                if (element != null) {
+                    element.remove()
+
+                    // remove from other tags too
+                    if (element.tags) {
+                        for (let othertag of element.tags) {
+                            if (othertag) {
+                                rhyform.tags[othertag] = rhyform.tags[othertag].filter(e => e !== element);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (let element of elements) {
+                if (element && element.name && rhyform[element.name]) {
+                    // delete Instance
+                    delete rhyform[element.name]
+                }
+            }
+
+            if (rhyform.tags && rhyform.tags[tag]) {
+                delete rhyform.tags[tag];
+            }
+        },
+
+        deleteElementsWithTag: function(tag) {
+            rhyform.removeElementsWithTag(tag)
         },
 
         createGradient: function(at=[{color: 'white', position: 0}, {color: "black", position: 1}], direction="horizontal") {
@@ -3602,8 +4863,69 @@ var rhyform = (function() {
             return new Button(content, onClick);
         },
 
+        createSlider: function(options) {
+
+            const defaults = {
+                at: {x: 0, y: 0, z: 0},
+                width: 5,
+                min: 0,
+                max: 100,
+                value: 50,
+                step: 1,
+                sliderProperties: {
+                    onChange: function(){ console.log("Slider value changed"); },
+                    valueTransformToText: function(value) {return value;},
+                    thumbSize: 20,
+                    thumbColor: "hsla(198, 100% 60%, 1)", 
+                    trackFillColor: "hsla(198, 100%, 40%, 1)",
+                    trackColor: "hsla(198, 0%, 100%, 0.3)",
+                    thickness: 10,
+                    isAlwaysVisible: false,
+                    backgroundType: 'glassy',
+                    borderColor: 'hsla(0, 0%, 50%, 0.1)'
+                },
+                valueDisplayProperties: {
+                    color: "white",
+                    fontSize: "xxx-large",
+                    font: "Gaegu"
+                },
+                labelTextProperties: {
+                    color: "hsla(0, 0%, 70%, 1)",
+                    fontSize: 'auto',
+                    font: "Gaegu",
+                    text: "Temperature"
+                },
+                labelDescriptionProperties: {
+                    color: "hsla(0, 0%, 40%, 1)",
+                    fontSize: 'small',
+                    font: "Gaegu",
+                    text: "The value represents the change in some quantity that is important to this visualization. Maybe it's the number of people in a room, or the amount of money in a bank account or number of stars in a galaxy ⭐️."
+                }
+            };
+        
+
+            const sliderProperties = Object.assign({}, defaults.sliderProperties, options.sliderProperties);
+            const valueDisplayProperties = Object.assign({}, defaults.valueDisplayProperties, options.valueDisplayProperties);
+            const labelTextProperties = Object.assign({}, defaults.labelTextProperties, options.labelTextProperties);
+            const labelDescriptionProperties = Object.assign({}, defaults.labelDescriptionProperties, options.labelDescriptionProperties);
+
+            const params = Object.assign({}, defaults, options);
+            params.sliderProperties = sliderProperties;
+            params.valueDisplayProperties = valueDisplayProperties;
+            params.labelTextProperties = labelTextProperties;
+            params.labelDescriptionProperties = labelDescriptionProperties;
+            
+            return new ValueSlider(params.at, params.width, params.min, params.max, params.value, params.step, params.sliderProperties, params.valueDisplayProperties, params.labelTextProperties, params.labelDescriptionProperties);
+        },
+
+
+
+
         selectActiveScene: function(scene) {
             this.activeScene = scene;
+        },
+
+        moveToTop: function(element) {
         },
 
 
