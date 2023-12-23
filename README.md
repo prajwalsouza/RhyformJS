@@ -1,3 +1,6 @@
+
+<img src="/images/rhyform.svg" alt="drawing" width="200"/>
+
 # RhyformJS 🎨
 Animating shapes, forms, creating visualizations especially for science. 🔬 An attempt to bring the magic of [Manim](https://github.com/3b1b/manim) to the web. 
 
