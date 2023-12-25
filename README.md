@@ -9,6 +9,8 @@ Powered by [ViewX](https://github.com/prajwalsouza/viewX), [Protrace JS](https:/
 >⚠️ **WARNING:** The library is far from complete, and still lacks 3D support, complex geometries, HTML canvas rendering, camera movement, etc. 🚧 
 <br/>
 
+<img src="/images/rhyform-demo.gif" alt="drawing" width="600"/>
+
 ## How to Use 🛠️
 
 **Example: Creating a Scene with Objects**
