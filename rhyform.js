@@ -194,7 +194,7 @@ var rhyform = (function() {
             anim = new Animation(0, inSeconds*2, inSeconds, 30, animateImmediately = false, animOptions=htmlAnimationOptions, type="html-css-style")
             return anim;
         } else if (element instanceof Equation  || element instanceof VectorImage) {
-                console.log(element.curves)
+                // console.log(element.curves)
                 for (let curveElement of element.curves) {
                     if (curveElement instanceof Curve) {
                         animationOptions.keyframes["0"][curveElement.name] = {
@@ -275,6 +275,21 @@ var rhyform = (function() {
 
         } 
     }
+
+    function updateViewXProperties(element, properties) {
+        propertiesToSet = []
+        if (element instanceof Point || element instanceof Line || element instanceof Curve || element instanceof Circle) {
+            propertyToSet = {
+                'graphName': element.space.name + "-graph",
+                'objectName': element.name,
+                'properties': properties
+            }
+            viewX.updateObjects([propertyToSet])
+        } 
+
+        
+    }
+
 
     function changeHTMLProperties(element, propertiesAndValuesBefore, propertiesAndValuesAfter, inSeconds=1) {
 
@@ -371,7 +386,7 @@ var rhyform = (function() {
                     const P1 = { x: args[0], y: args[1] };
                     const P2 = { x: args[2], y: args[3] };
                     const P3 = { x: args[4], y: args[5] };
-                    const points = cubicBezierPoints(currentPoint, P1, P2, P3, 10, width, height);
+                    const points = cubicBezierPoints(currentPoint, P1, P2, P3, rhyform.drawingPrecision, width, height);
 
                     for (let point of points) {
                         currentSubPath.push({type: 'L', x: point.x, y: point.y});
@@ -1331,6 +1346,10 @@ var rhyform = (function() {
             return this.seekBar;
         }
 
+        this.getElementsInvolved = function() {
+            return rhyform.tags["<scene>" + this.name] || [];
+        }
+
         
     }
 
@@ -1559,6 +1578,38 @@ var rhyform = (function() {
                 return this;
             }
         };
+
+        this.set = {
+            size: (size) => {
+                this.createBasicPoint();
+                updateViewXProperties(this, {pointsize: size});
+                this.size = size;
+                return this;
+            },
+
+            color: (color) => {
+                this.createBasicPoint();
+                updateViewXProperties(this, {pointcolor: color});
+                this.color = color;
+                return this;
+            },
+
+            position: (x=0, y=0, z= 0) => {
+                this.createBasicPoint();
+                updateViewXProperties(this, {x: x, y: y});
+                this.coordinates = {x: x, y: y, z: z};
+                return this;
+            },
+
+            opacity: (opacity) => {
+                this.createBasicPoint();
+                updateViewXProperties(this, {opacity: opacity});
+                
+                this.opacity = opacity;
+                // console.log(this.opacity)
+                return this;
+            }
+        }
 
         this.change = {
             size: (size, inSeconds=1) => {
@@ -3597,6 +3648,33 @@ var rhyform = (function() {
 
         }
 
+        this.set = {    
+            value: (value) => {
+                this.value = value;
+                this.updateSlider();
+                return this;
+            },
+
+            min: (min) => {
+                this.min = min;
+                this.updateSlider();
+                return this;
+            },
+
+            max: (max) => {
+                this.max = max;
+                this.updateSlider();
+                return this;
+
+            },
+
+            step: (step) => {
+                this.step = step;
+                this.updateSlider();
+                return this;
+            },
+        }
+
 
 
         this.show = function(inSeconds=1) {
@@ -3609,6 +3687,10 @@ var rhyform = (function() {
             // this.element.style.pointerEvents = "none";
             theAnim = hideElement(this, inSeconds);
             return theAnim;
+        }
+
+        this.remove = function() {
+            this.element.remove();
         }
 
         return this;
@@ -3772,6 +3854,9 @@ var rhyform = (function() {
             },
         };
 
+        this.remove = function() {
+            this.element.remove();
+        }
 
     }
 
@@ -4308,6 +4393,18 @@ var rhyform = (function() {
             }
         }
 
+
+        this.set = {
+            color : (color) => {
+                this.color = color;
+                for (let curve of this.curves) {
+                    curve.change.color(color).startNextImmediately()
+                }
+                return this;
+            },
+            
+        }
+
         this.remove = function() {
             for (let curve of this.curves) {
                 curve.remove()
@@ -4685,6 +4782,8 @@ var rhyform = (function() {
 
         objectAdditionIndex: 0,
 
+        drawingPrecision: 10,
+
         generateEquation: function(expression="x", at={x:0, y:0, z:0}, color="white", fontSize="20px") {
             return new Promise((resolve, reject) => {
                 equationToPoints(expression, fontSize).then(equationInfo => {
@@ -4760,6 +4859,7 @@ var rhyform = (function() {
 
             for (let element of elements) {
                 if (element != null) {
+                    // console.log(element)
                     element.remove()
 
                     // remove from other tags too
