@@ -1,7 +1,14 @@
 var rhyform = (function() {
     
-    // Constructors and their associated methods
+    // Check if MathJax is loaded
 
+    if (typeof MathJax === 'undefined') {
+        console.error("MathJax is not loaded. Please load MathJax before loading Rhyform.");
+        return;
+    }
+
+
+    // Constructors and their associated methods
 
     defaultSpaceBounds = {
         xmax: 11,
