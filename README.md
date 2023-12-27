@@ -30,6 +30,9 @@ myScene.selectSpace(space);
 // Add a point in the space
 var point1 = rhyform.createPoint({x: 1, y: 2});
 point1.show();
+
+// Rendering the scene.
+myScene.play(); 
 ```
 🔗 Enjoy method chaining for concise and elegant code!
 
