@@ -2,7 +2,7 @@ var rhyform = (function() {
     
     // Check if MathJax is loaded
 
-    if (typeof MathJax === 'undefined') {
+    if (typeof MathJax.typesetPromise === 'undefined') {
         console.error("MathJax is not loaded. Please load MathJax before loading Rhyform.");
         return;
     }
