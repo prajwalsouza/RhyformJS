@@ -122,6 +122,14 @@ Working example can be found here [https://playcode.io/1707347](https://playcode
             baseTriangleCurve.loadWith.fillColor('hsla(198, 100%, 60%, 1)').loadWith.color('transparent')
             baseTriangleCurve.show().startNextImmediately();
 
+
+            // Maybe some music for the scene, once the triangle is loaded?
+            // The music plays only if the user has interactive with the scene, or the webpage. Or asking user to click on the screen to start is sometimes a good idea. 
+            
+            music = rhyform.createAudio('https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@main/images/shooting-stars-142600.mp3')
+            music.play()
+
+
             introText.hide()
             pythagorasTheorem = rhyform.createText("The Pythagorean Theorem states that the square of the hypotenuse of a right angled triangle is equal to the sum of the squares of the other two sides. $$a^2 + b^2 = c^2$$ ").place.below(introText).loadWith.fontSize("large");
 
