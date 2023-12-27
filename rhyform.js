@@ -1645,6 +1645,10 @@ var rhyform = (function() {
             viewX.removePoint(this.space.name + "-graph", this.name);
         }
 
+        this.duplicate = function() {
+            return new Point(this.coordinates, this.size, this.color);
+        }
+
 
     }
 
@@ -2017,6 +2021,12 @@ var rhyform = (function() {
                 this.textAlign = textAlign;
                 this.element.style.textAlign = this.textAlign;
                 return this;
+            },
+
+            opacity: (opacity) => {
+                this.opacity = opacity;
+                this.element.style.opacity = this.opacity;
+                return this;
             }
         }; 
         
@@ -2172,6 +2182,22 @@ var rhyform = (function() {
         }
 
 
+        this.duplicate = function() {
+            newText = new Text(this.content);
+            newText.color = this.color;
+            newText.font = this.font;
+            newText.fontSize = this.fontSize;
+            newText.width = this.width;
+            newText.height = this.height;
+            newText.textAlign = this.textAlign;
+            newText.coordinates = this.coordinates;
+            newText.findBounds();
+            newText.createBasicText();
+            newText.updateBasicText();
+            return newText;
+        }
+
+
     }
  
     function Button(content, onClick) {
@@ -2259,6 +2285,21 @@ var rhyform = (function() {
 
         this.remove = function() {
             this.textObject.remove();
+        }
+
+        this.duplicate = function() {
+            newButton = new Button(this.content, onClick);
+            newButton.color = this.color;
+            newButton.font = this.font;
+            newButton.fontSize = this.fontSize;
+            newButton.width = this.width;
+            newButton.height = this.height;
+            newButton.textAlign = this.textAlign;
+            newButton.coordinates = this.coordinates;
+            newButton.findBounds();
+            newButton.createBasicText();
+            newButton.updateBasicText();
+            return newButton;
         }
 
         return this;
@@ -2655,6 +2696,15 @@ var rhyform = (function() {
         this.remove = function() {
             viewX.removeLine(this.space.name + "-graph", this.name)
         }
+
+
+        this.duplicate = function() {
+            newLine = new Line([this.point1, this.point2]);
+            newLine.color = this.color;
+            newLine.thickness = this.thickness;
+            newLine.createBasicLine();
+            return newLine;
+        }
     }
 
     function Curve(points=[], thickness=0.2, color="white", fillcolor="none") {
@@ -3034,6 +3084,15 @@ var rhyform = (function() {
         this.remove = function() {
             viewX.removePath(this.space.name + "-graph", this.name)
         }
+
+
+        this.duplicate = function() {
+            newCurve = new Curve(this.points);
+            newCurve.color = this.color;
+            newCurve.thickness = this.thickness;
+            newCurve.createBasicCurve();
+            return newCurve;
+        }
     }
 
 
@@ -3274,6 +3333,14 @@ var rhyform = (function() {
 
         this.remove = function() {
             viewX.removeCircle(this.space.name + "-graph", this.name)
+        }
+
+        this.duplicate = function() {
+            newCircle = new Circle(this.center, this.radius);
+            newCircle.color = this.color;
+            newCircle.thickness = this.thickness;
+            newCircle.createBasicCircle();
+            return newCircle;
         }
 
     }
@@ -3693,6 +3760,12 @@ var rhyform = (function() {
             this.element.remove();
         }
 
+        this.duplicate = function() {
+            newSlider = new ValueSlider(this.coordinates, this.width, this.min, this.max, this.value, this.step, this.sliderProperties, this.valueDisplayProperties, this.labelTextProperties, this.labelDescriptionProperties);
+            newSlider.createBasicSlider();
+            return newSlider;
+        }
+
         return this;
 
 
@@ -3856,6 +3929,14 @@ var rhyform = (function() {
 
         this.remove = function() {
             this.element.remove();
+        }
+
+        this.duplicate = function() {
+            newAudio = new Audio(this.url);
+            newAudio.loop = this.loop;
+            newAudio.volume = this.volume;
+            newAudio.createBasicAudio();
+            return newAudio;
         }
 
     }
@@ -4150,6 +4231,12 @@ var rhyform = (function() {
                 curve.remove()
             }
         }
+
+        this.duplicate = function() {
+            newEquation = new Equation(this.points, this.expression, this.coordinates, this.width, this.color, this.fontSize);
+            newEquation.generateCurves()
+            return newEquation;
+        }
     }
 
 
@@ -4409,6 +4496,12 @@ var rhyform = (function() {
             for (let curve of this.curves) {
                 curve.remove()
             }
+        }
+
+        this.duplicate = function() {
+            newVectorImage = new VectorImage(this.url, this.coordinates, this.color, this.fillcolor, this.width);
+            newVectorImage.generateCurves()
+            return newVectorImage;
         }
 
         return this.generateCurves()
@@ -4888,6 +4981,32 @@ var rhyform = (function() {
         deleteElementsWithTag: function(tag) {
             rhyform.removeElementsWithTag(tag)
         },
+
+
+        duplicateElementsWithTag: function(tag) {
+            const elements = rhyform.tags[tag] || [];
+
+            newElements = []
+            for (let element of elements) {
+                if (element != null) {
+                    // console.log(element)
+                    newElement = element.duplicate()
+                    newElements.push(newElement)
+                }
+            }
+            
+            return newElements;
+        },
+
+        addTagToElements: function(elements, tag) {
+            for (let element of elements) {
+                if (element != null) {
+                    element.addTag(tag)
+                }
+            }
+        },
+
+
 
         createGradient: function(at=[{color: 'white', position: 0}, {color: "black", position: 1}], direction="horizontal") {
             return new Gradient(at, direction);
