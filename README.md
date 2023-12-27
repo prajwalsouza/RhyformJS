@@ -1,7 +1,7 @@
 
 <img src="/images/rhyform.svg" alt="drawing" width="200"/>
 
-# RhyformJS 🎨
+# RhyformJS 🎨🖌️
 Animating shapes, forms, creating visualizations especially for science. 🔬 An attempt to bring the magic of [Manim](https://github.com/3b1b/manim) to the web. 
 
 Powered by [ViewX](https://github.com/prajwalsouza/viewX), [Protrace JS](https://github.com/kilobtye/potrace), [MathJax](https://github.com/mathjax/MathJax) and inspired by [Manim](https://github.com/3b1b/manim). ✨
@@ -11,10 +11,10 @@ Powered by [ViewX](https://github.com/prajwalsouza/viewX), [Protrace JS](https:/
 
 <img src="/images/rhyform-demo.gif" alt="drawing" width="600"/>
 
-## Template
+## 📄 Template 
+A Working example can be found here [https://playcode.io/1707347](https://playcode.io/1707347) 🙂
+The library relies on loading of MathJax, hence, you can see a "weird" ```setInterval``` solution at the end of the template in the script. 💻
 
-The following is a working example. The library relies on loaading of MathJax, hence, you can see a "weird" ```setInterval``` solution at the end of the template in the script. 
-Working example can be found here [https://playcode.io/1707347](https://playcode.io/1707347)
 ```html
 <!DOCTYPE html>
 <html>
@@ -147,7 +147,7 @@ Working example can be found here [https://playcode.io/1707347](https://playcode
 
         }
 
-        // Check if MathJax is loaded
+        // Check if MathJax is loaded, this is needed because the code above relies on MathJax.typeset function. 
         var checkIfMathJaxIsLoaded = setInterval(function () {
             if (MathJax.typeset) {
                 console.log("MathJax is loaded")
