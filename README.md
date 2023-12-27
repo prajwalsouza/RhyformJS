@@ -11,6 +11,153 @@ Powered by [ViewX](https://github.com/prajwalsouza/viewX), [Protrace JS](https:/
 
 <img src="/images/rhyform-demo.gif" alt="drawing" width="600"/>
 
+## Template
+
+The following is a working example. The library relies on loaading of MathJax, hence, you can see a "weird" ```setInterval``` solution at the end of the template in the script. 
+Working example can be found here [https://playcode.io/1707347](https://playcode.io/1707347)
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rhyform - Pythagoras theorem - Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Nanum+Pen+Script&display=swap"
+        rel="stylesheet">
+
+    <!-- Some times used library for icons -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+
+<body style='margin:0px; display: block; background: black;'>
+    <div id="containAll" class="p-sm-3 p-1">
+        <div id="main-inner-box" style="min-height: 100vh;">
+            <div id="mainDisplay"></div>
+        </div>
+    </div>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        // MathJax is important that it is renderered in svg mode.
+
+        MathJax = {
+
+            loader: { load: ['[tex]/color'] },
+            svg: {
+                fontCache: 'local'
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+
+    </script>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/input/tex/extensions/color.js" charset="UTF-8"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/kilobtye/potrace@master/potrace.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/prajwalsouza/viewX@main/viewx.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@main/rhyform.js"></script>
+
+    <script>
+
+
+        // Define the main space for drawing, the area where the scene takes place
+        var space = rhyform.createSpaceInElement('#mainDisplay', name = "educationSpace");
+        space.camera.setBounds({ x: -10, y: -10, width: 20, height: 20 });
+
+        // Set the common font to be used as default, unless overridden
+        rhyform.font = "Gaegu";
+
+        async function loadMainScene() {
+
+            // Define a new educational scene
+            var mainScene = rhyform.createScene('The Pythagorean Theorem');
+            mainScene.selectSpace(space);
+
+            // Create a point to represent the origin
+            var originPoint = rhyform.createPoint().place.at(x = 0, y = 0).loadWith.size(0.3).addTag('points');
+            originPoint.show();
+
+            var introText = rhyform.createText("Consider a right angled triangle.").place.at(x = -8, y = 7).loadWith.fontSize("large");
+            introText.write().startNextImmediately();
+
+            // Create a point to represent the adjacent side of the triangle
+            var adjPoint = rhyform.createPoint().place.at(x = 5, y = 0).loadWith.size(0.3).addTag('points');
+            adjPoint.show().startNextImmediately();
+
+            // Create a point to represent the opposite side of the triangle
+            var oppPoint = rhyform.createPoint().place.at(x = 5, y = 3).loadWith.size(0.3).addTag('points');
+            oppPoint.show().startNextImmediately();
+
+            // Create a line to represent the base of the triangle
+            var baseLine = rhyform.createLine(originPoint, adjPoint).addTag('base');
+            baseLine.draw(lengthPerSecond = 7).startNextImmediately();
+
+            // Create a text label for the base of the triangle
+            var baseLabel = rhyform.createText("a").place.below(baseLine, 0.5).loadWith.fontSize("large");
+            baseLabel.show()
+
+            // Create a line to represent the perpendicular side of the triangle
+            var perpendicularLine = rhyform.createLine(adjPoint, oppPoint).addTag('perpendicular');
+            perpendicularLine.draw(lengthPerSecond = 7).startNextImmediately();
+
+            // Create a text label for the perpendicular side of the triangle
+            var perpendicularLabel = rhyform.createText("b").place.rightOf(perpendicularLine, 0.5).loadWith.fontSize("large");
+            perpendicularLabel.show();
+
+            // Create a line to represent the hypotenuse of the triangle
+            var hypotenuseLine = rhyform.createLine(originPoint, oppPoint).addTag('hypotenuse');
+            hypotenuseLine.draw(lengthPerSecond = 7).startNextImmediately();
+
+            // Create a text label for the hypotenuse of the triangle
+            var hypotenuseLabel = rhyform.createText("c").place.above(hypotenuseLine, -0.3).loadWith.fontSize("large");
+            hypotenuseLabel.show();
+
+            var baseTriangleCurve = rhyform.createCurve(points = [originPoint, adjPoint, oppPoint, originPoint]).addTag('baseTriangle');
+            baseTriangleCurve.loadWith.fillColor('hsla(198, 100%, 60%, 1)').loadWith.color('transparent')
+            baseTriangleCurve.show().startNextImmediately();
+
+            introText.hide()
+            pythagorasTheorem = rhyform.createText("The Pythagorean Theorem states that the square of the hypotenuse of a right angled triangle is equal to the sum of the squares of the other two sides. $$a^2 + b^2 = c^2$$ ").place.below(introText).loadWith.fontSize("large");
+
+            pythagorasTheorem.write(lettersPerSecond = 40)
+
+
+            pythagorasEquation = await rhyform.generateEquation(expression = "a^2 + b^2", at = { x: 2, y: 6 }, color = 'hsla(198, 100%, 70%, 1)', fontSize = 2)
+
+            pythagorasEquation.show()
+
+            await pythagorasEquation.change.expression("a^2 + b^2 = c^2")
+
+            // Start rendering the scene
+            mainScene.play();
+
+        }
+
+        // Check if MathJax is loaded
+        var checkIfMathJaxIsLoaded = setInterval(function () {
+            if (MathJax.typeset) {
+                console.log("MathJax is loaded")
+                clearInterval(checkIfMathJaxIsLoaded);
+
+
+                loadMainScene();
+            }
+        }, 0);
+
+
+    </script>
+</body>
+
+</html>
+
+```
+
 ## How to Use 🛠️
 
 **Example: Creating a Scene with Objects**
