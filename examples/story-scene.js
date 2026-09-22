@@ -112,10 +112,16 @@ export async function createStory(stage) {
     "Replace +z² with −z². The equation, the amber slice, and the surface change together.",
   );
   equation
-    .transformTo(saddleEquation, { duration: 3.5 })
+    .transformTo(
+      { ...saddleEquation, at: [-0.4, 2.6, -1.2] },
+      { duration: 3.5 },
+    )
     .startNextImmediately();
-  surface.transformTo(saddle, { duration: 3.5 }).startNextImmediately();
-  across.transformTo(downwards, { duration: 3.5 });
+  surface
+    .transformTo({ ...saddle, at: [0, 0.3, 0] }, { duration: 3.5 })
+    .startNextImmediately();
+  along.moveTo([0, 1, 0], 3.5).startNextImmediately();
+  across.transformTo({ ...downwards, at: [0, 1, 0] }, { duration: 3.5 });
   scene.wait(2.5);
 
   chapter(
