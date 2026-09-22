@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Rhyform · Original Pythagoras scene</title>
+<style>body{margin:0;background:#111;color:white;font-family:Georgia,serif}header{padding:18px 24px;display:flex;gap:24px;align-items:center;font:14px system-ui}a{color:inherit}button{padding:8px 14px;cursor:pointer}#mainDisplay{width:min(900px,100vw);height:760px;margin:auto}space,space>div{height:100%}#status{font:13px system-ui;color:#aab}</style>
+<script src="../rhyform.js"></script>
+<script>window.MathJax={svg:{fontCache:'local'},options:{enableMenu:false}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head><body><header><a href="./">← Motion studies</a><button id="replay" disabled>Replay original scene</button><span id="status">Loading MathJax…</span></header><div id="mainDisplay"></div><script>
+MathJax.startup.promise.then(async()=>{
+        // Define the main space for drawing, the area where the scene takes place
+        var space = rhyform.createSpaceInElement('#mainDisplay', name = "educationSpace");
+        space.camera.setBounds({ x: -10, y: -10, width: 20, height: 20 });
+
+        // Set the common font to be used as default, unless overridden
+        rhyform.font = "Georgia";
+
+        async function loadMainScene() {
+
+            // Define a new educational scene
+            var mainScene = rhyform.createScene('The Pythagorean Theorem');
+            mainScene.selectSpace(space);
+
+            // Create a point to represent the origin
+            var originPoint = rhyform.createPoint().place.at(x = 0, y = 0).loadWith.size(0.3).addTag('points');
+            originPoint.show();
+
+            var introText = rhyform.createText("Consider a right angled triangle.").place.at(x = -8, y = 7).loadWith.fontSize("large");
+            introText.write().startNextImmediately();
+
+            // Create a point to represent the adjacent side of the triangle
+            var adjPoint = rhyform.createPoint().place.at(x = 5, y = 0).loadWith.size(0.3).addTag('points');
+            adjPoint.show().startNextImmediately();
+
+            // Create a point to represent the opposite side of the triangle
+            var oppPoint = rhyform.createPoint().place.at(x = 5, y = 3).loadWith.size(0.3).addTag('points');
+            oppPoint.show().startNextImmediately();
+
+            // Create a line to represent the base of the triangle
+            var baseLine = rhyform.createLine(originPoint, adjPoint).addTag('base');
+            baseLine.draw(lengthPerSecond = 7).startNextImmediately();
+
+            // Create a text label for the base of the triangle
+            var baseLabel = rhyform.createText("a").place.below(baseLine, 0.5).loadWith.fontSize("large");
+            baseLabel.show()
+
+            // Create a line to represent the perpendicular side of the triangle
+            var perpendicularLine = rhyform.createLine(adjPoint, oppPoint).addTag('perpendicular');
+            perpendicularLine.draw(lengthPerSecond = 7).startNextImmediately();
+
+            // Create a text label for the perpendicular side of the triangle
+            var perpendicularLabel = rhyform.createText("b").place.rightOf(perpendicularLine, 0.5).loadWith.fontSize("large");
+            perpendicularLabel.show();
+
+            // Create a line to represent the hypotenuse of the triangle
+            var hypotenuseLine = rhyform.createLine(originPoint, oppPoint).addTag('hypotenuse');
+            hypotenuseLine.draw(lengthPerSecond = 7).startNextImmediately();
+
+            // Create a text label for the hypotenuse of the triangle
+            var hypotenuseLabel = rhyform.createText("c").place.above(hypotenuseLine, -0.3).loadWith.fontSize("large");
+            hypotenuseLabel.show();
+
+            var baseTriangleCurve = rhyform.createCurve(points = [originPoint, adjPoint, oppPoint, originPoint]).addTag('baseTriangle');
+            baseTriangleCurve.loadWith.fillColor('hsla(198, 100%, 60%, 1)').loadWith.color('transparent')
+            baseTriangleCurve.show().startNextImmediately();
+
+
+            // Maybe some music for the scene, once the triangle is loaded?
+            // The music plays only if the user has interactive with the scene, or the webpage. Or asking user to click on the screen to start is sometimes a good idea.
+
+            music = rhyform.createAudio('../images/shooting-stars-142600.mp3')
+            music.play()
+
+
+            introText.hide()
+            pythagorasTheorem = rhyform.createText("The Pythagorean Theorem states that the square of the hypotenuse of a right angled triangle is equal to the sum of the squares of the other two sides. $$a^2 + b^2 = c^2$$ ").place.below(introText).loadWith.fontSize("large");
+
+            pythagorasTheorem.write(lettersPerSecond = 40)
+
+
+            pythagorasEquation = await rhyform.generateEquation(expression = "a^2 + b^2", at = { x: 2, y: 6 }, color = 'hsla(198, 100%, 70%, 1)', fontSize = 2)
+
+            pythagorasEquation.show()
+
+            await pythagorasEquation.change.expression("a^2 + b^2 = c^2")
+
+            // Start rendering the scene
+            mainScene.prepare();
+            window.exampleScene = mainScene;
+            mainScene.play();
+
+        }
+
+
+        await loadMainScene();
+        document.getElementById('status').textContent='Original scene, updated runtime';
+        const replay=document.getElementById('replay');replay.disabled=false;replay.onclick=()=>exampleScene.play();
+}).catch(error=>{document.getElementById('status').textContent=error.message;});
+</script></body></html>

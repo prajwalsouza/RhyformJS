@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Small instructions, expressive motion. Explore Rhyform's browser-native SVG animation with the code alongside each scene.">
+  <title>Rhyform · A study in transformation</title>
+  <link rel="stylesheet" href="demo.css">
+  <script defer src="../rhyform.js"></script>
+  <script defer src="demo.js"></script>
+</head>
+<body>
+  <header class="masthead"><a class="wordmark" href="./" aria-label="Rhyform home">rhyform<span aria-hidden="true">∿</span></a><span class="edition">Studies in motion / 01</span><a class="source-link" href="../README.md">Library guide ↗</a></header>
+  <main>
+    <nav class="section-nav" aria-label="Examples"><a href="./" aria-current="page">Motion studies</a><a href="controls.html">Interactive controls ↗</a></nav>
+    <div class="intro"><div><p class="eyebrow">A browser-native animation library</p><h1>Give an idea a little motion.</h1></div><p class="lede">A few instructions. A shape becoming something else. <br>Play the scene, or take it apart one moment at a time.</p></div>
+    <nav class="studies" aria-label="Choose a scene">
+      <button type="button" data-study="0" aria-pressed="true"><span>01</span>Shape to shape</button>
+      <button type="button" data-study="1" aria-pressed="false"><span>02</span>The space inside</button>
+      <button type="button" data-study="2" aria-pressed="false"><span>03</span>A curve becomes a wave</button>
+      <button type="button" data-study="3" aria-pressed="false"><span>04</span>Import an SVG</button>
+      <button type="button" data-study="4" aria-pressed="false"><span>05</span>Equations</button>
+      <button type="button" data-study="5" aria-pressed="false"><span>06</span>Math → shape</button>
+      <button type="button" data-study="6" aria-pressed="false"><span>07</span>Complex equations</button>
+    </nav>
+    <div class="workbench">
+      <section class="code-panel" aria-labelledby="code-heading">
+        <div class="panel-head"><h2 id="code-heading">The instructions</h2><button type="button" id="copy">Copy code</button></div>
+        <pre tabindex="0" aria-label="Complete code for this animation"><code id="code"></code></pre>
+        <div class="import-note"><span>Core</span><code>&lt;script src="rhyform.js"&gt;&lt;/script&gt;</code><span id="math-dependency" hidden>+ MathJax 3.2.2 · SVG typesetter</span></div>
+      </section>
+      <section class="scene-panel" aria-label="Animation preview">
+        <div class="panel-head"><h2 id="scene-title">Circle → square → bloom</h2><span id="play-state">Ready to play</span></div>
+        <div id="import-tools" class="import-tools" hidden><a href="../images/rhyform.svg" target="_blank" rel="noopener">View sample SVG ↗</a><button type="button" id="choose-svg">Choose SVG…</button><button type="button" id="reset-svg" hidden>Restore sample</button><input type="file" id="svg-file" accept=".svg,image/svg+xml" hidden><span id="file-name">rhyform.svg</span></div>
+        <div class="stage-wrap"><div id="stage" role="img" aria-label="A circle that transforms into a filled square, then a procedural flower"></div><p class="stage-caption" id="caption">One outline. Three ways of being.</p></div>
+        <div class="transport"><div class="playback"><button type="button" id="play" class="primary">Play scene <span aria-hidden="true">▶</span></button><button type="button" id="restart" aria-label="Restart scene">↺ <span>Restart</span></button></div><div id="controls"></div></div>
+      </section>
+    </div>
+    <div class="study-note"><p id="note">The same object keeps its identity as its contour and fill change. The final shape comes from a small mathematical function.</p><span id="count">01 / 07</span></div>
+    <p id="error" role="alert" hidden></p><span id="announcement" class="sr-only" role="status"></span>
+  </main>
+  <footer><span>Rhyform / Small instructions, expressive motion.</span><span>SVG · JavaScript · Made for the browser</span></footer>
+</body>
+</html>

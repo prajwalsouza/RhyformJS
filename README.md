@@ -1,400 +1,253 @@
+# RhyformJS
 
-<img src="/images/rhyform.svg" alt="drawing" width="200"/>
+Small instructions for mathematical animation in the browser. Draw a shape, transform it into another, and let a reader move through the scene with a slider.
 
-# RhyformJS 🎨🖌️
-Animating shapes, forms, creating visualizations especially for science. 🔬 An attempt to bring the magic of [Manim](https://github.com/3b1b/manim) to the web. 
+Inspired by Manim's mathematical storytelling, with browser interaction as a first-class part of the scene.
 
-Powered by [ViewX](https://github.com/prajwalsouza/viewX), [Protrace JS](https://github.com/kilobtye/potrace), [MathJax](https://github.com/mathjax/MathJax) and inspired by [Manim](https://github.com/3b1b/manim). ✨
-
->⚠️ **WARNING:** The library is far from complete, and still lacks 3D support, complex geometries, HTML canvas rendering, camera movement, etc. 🚧 
-<br/>
-
-<img src="/images/rhyform-demo.gif" alt="drawing" width="600"/>
-
-## 📄 Template 
-A Working example can be found here [https://playcode.io/1707347](https://playcode.io/1707347) 🙂
-The library relies on loading of MathJax, hence, you can see a "weird" ```setInterval``` solution at the end of the template in the script. 💻
+Version **0.2.0**. See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
 
 ```html
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Rhyform - Pythagoras theorem - Demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Nanum+Pen+Script&display=swap"
-        rel="stylesheet">
-
-    <!-- Some times used library for icons -->
-    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
-        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-</head>
-
-<body style='margin:0px; display: block; background: black;'>
-    <div id="containAll" class="p-sm-3 p-1">
-        <div id="main-inner-box" style="min-height: 100vh;">
-            <div id="mainDisplay"></div>
-        </div>
-    </div>
-
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script>
-        // MathJax is important that it is renderered in svg mode.
-
-        MathJax = {
-
-            loader: { load: ['[tex]/color'] },
-            svg: {
-                fontCache: 'local'
-            },
-            options: {
-                enableMenu: false
-            }
-        };
-
-    </script>
-    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/input/tex/extensions/color.js" charset="UTF-8"></script>
-
-    <script src="https://cdn.jsdelivr.net/gh/kilobtye/potrace@master/potrace.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/prajwalsouza/viewX@main/viewx.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@main/rhyform.js"></script>
-
-    <script>
-
-
-        // Define the main space for drawing, the area where the scene takes place
-        var space = rhyform.createSpaceInElement('#mainDisplay', name = "educationSpace");
-        space.camera.setBounds({ x: -10, y: -10, width: 20, height: 20 });
-
-        // Set the common font to be used as default, unless overridden
-        rhyform.font = "Gaegu";
-
-        async function loadMainScene() {
-
-            // Define a new educational scene
-            var mainScene = rhyform.createScene('The Pythagorean Theorem');
-            mainScene.selectSpace(space);
-
-            // Create a point to represent the origin
-            var originPoint = rhyform.createPoint().place.at(x = 0, y = 0).loadWith.size(0.3).addTag('points');
-            originPoint.show();
-
-            var introText = rhyform.createText("Consider a right angled triangle.").place.at(x = -8, y = 7).loadWith.fontSize("large");
-            introText.write().startNextImmediately();
-
-            // Create a point to represent the adjacent side of the triangle
-            var adjPoint = rhyform.createPoint().place.at(x = 5, y = 0).loadWith.size(0.3).addTag('points');
-            adjPoint.show().startNextImmediately();
-
-            // Create a point to represent the opposite side of the triangle
-            var oppPoint = rhyform.createPoint().place.at(x = 5, y = 3).loadWith.size(0.3).addTag('points');
-            oppPoint.show().startNextImmediately();
-
-            // Create a line to represent the base of the triangle
-            var baseLine = rhyform.createLine(originPoint, adjPoint).addTag('base');
-            baseLine.draw(lengthPerSecond = 7).startNextImmediately();
-
-            // Create a text label for the base of the triangle
-            var baseLabel = rhyform.createText("a").place.below(baseLine, 0.5).loadWith.fontSize("large");
-            baseLabel.show()
-
-            // Create a line to represent the perpendicular side of the triangle
-            var perpendicularLine = rhyform.createLine(adjPoint, oppPoint).addTag('perpendicular');
-            perpendicularLine.draw(lengthPerSecond = 7).startNextImmediately();
-
-            // Create a text label for the perpendicular side of the triangle
-            var perpendicularLabel = rhyform.createText("b").place.rightOf(perpendicularLine, 0.5).loadWith.fontSize("large");
-            perpendicularLabel.show();
-
-            // Create a line to represent the hypotenuse of the triangle
-            var hypotenuseLine = rhyform.createLine(originPoint, oppPoint).addTag('hypotenuse');
-            hypotenuseLine.draw(lengthPerSecond = 7).startNextImmediately();
-
-            // Create a text label for the hypotenuse of the triangle
-            var hypotenuseLabel = rhyform.createText("c").place.above(hypotenuseLine, -0.3).loadWith.fontSize("large");
-            hypotenuseLabel.show();
-
-            var baseTriangleCurve = rhyform.createCurve(points = [originPoint, adjPoint, oppPoint, originPoint]).addTag('baseTriangle');
-            baseTriangleCurve.loadWith.fillColor('hsla(198, 100%, 60%, 1)').loadWith.color('transparent')
-            baseTriangleCurve.show().startNextImmediately();
-
-
-            // Maybe some music for the scene, once the triangle is loaded?
-            // The music plays only if the user has interactive with the scene, or the webpage. Or asking user to click on the screen to start is sometimes a good idea. 
-            
-            music = rhyform.createAudio('https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@main/images/shooting-stars-142600.mp3')
-            music.play()
-
-
-            introText.hide()
-            pythagorasTheorem = rhyform.createText("The Pythagorean Theorem states that the square of the hypotenuse of a right angled triangle is equal to the sum of the squares of the other two sides. $$a^2 + b^2 = c^2$$ ").place.below(introText).loadWith.fontSize("large");
-
-            pythagorasTheorem.write(lettersPerSecond = 40)
-
-
-            pythagorasEquation = await rhyform.generateEquation(expression = "a^2 + b^2", at = { x: 2, y: 6 }, color = 'hsla(198, 100%, 70%, 1)', fontSize = 2)
-
-            pythagorasEquation.show()
-
-            await pythagorasEquation.change.expression("a^2 + b^2 = c^2")
-
-            // Start rendering the scene
-            mainScene.play();
-
-        }
-
-        // Check if MathJax is loaded, this is needed because the code above relies on MathJax.typeset function. 
-        var checkIfMathJaxIsLoaded = setInterval(function () {
-            if (MathJax.typeset) {
-                console.log("MathJax is loaded")
-                clearInterval(checkIfMathJaxIsLoaded);
-
-
-                loadMainScene();
-            }
-        }, 0);
-
-
-    </script>
-</body>
-
-</html>
-
+<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.2.0/rhyform.min.js"></script>
 ```
 
-## How to Use 🛠️
+You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.2.0) and serve them locally. Both bundles embed their license notices.
 
-**Example: Creating a Scene with Objects**
-```javascript
-// Initialize a new scene
-var myScene = rhyform.createScene("MyScene");
+[Open the motion studies](examples/index.html) for runnable code beside each animation, including SVG imports and equation transforms. [Interactive controls](examples/controls.html) demonstrates live parameters and built-in transport. [The original Pythagoras scene](examples/legacy-pythagoras.html) demonstrates the older fluent API on the updated runtime.
 
-// Activate the created scene
-rhyform.selectActiveScene(myScene);
+## One script, one scene
 
-// Generate a space within the 'body' element
-var space = rhyform.createSpaceInElement("body", "MainSpace");
+Download `rhyform.js` or `rhyform.min.js` and serve it alongside your page. The renderer and SVG parser are included. Geometry, text, SVG transforms, playback, and sliders need no framework, CDN, MathJax, or Potrace. There is no install or build step for authors using the supplied bundle.
 
-// Select the space for the current scene
-myScene.selectSpace(space);
+```html
+<div id="stage" style="height: 440px"></div>
+<div id="controls"></div>
+<script src="rhyform.js"></script>
+<script>
+  const scene = rhyform.scene('#stage');
+  const circle = rhyform.circle({ radius: 1.7 });
+  const square = rhyform.square({
+    size: 3.4, fill: '#d4a35d'
+  });
 
-// Add a point in the space
-var point1 = rhyform.createPoint({x: 1, y: 2});
-point1.show();
+  const shape = scene.shape(circle);
+  shape.draw(1.2);
+  scene.wait(0.5);
+  shape.transformTo(square, { duration: 1.8 });
 
-// Rendering the scene.
-myScene.play(); 
+  scene.slider('#controls');
+  scene.play();
+</script>
 ```
-🔗 Enjoy method chaining for concise and elegant code!
 
-### Workflow for Displaying Objects 📌
-- **Scene Creation**: `var myScene = rhyform.createScene("MyScene");` 
-  Then, `rhyform.selectActiveScene(myScene);` to activate.
-- **Space Creation**: `var space = rhyform.createSpaceInElement("body", "MainSpace");` 
-  Follow with `myScene.selectSpace(space);` for selection.
-- **Point Creation**: Use `point = rhyform.createPoint();` for a new point at the origin.
-- **Point Positioning**: `point.place.at(x=2, y=2);` to set position (outside animation).
-- **Color Change (Pre-animation)**: `point.loadWith.color('red');` for initial color.
-- **Point Display**: `point.show();` to display the point (part of animation).
-- **Color Change (During Animation)**: `point.change.color('blue');` for animated color change.
-- **Play Scene**: Execute `myScene.play();` to animate the scene.
+A standalone browser page is supported. This is a browser library, not a DOM-free Node.js renderer. `src/` is modular source for development; the supplied classic script is the distribution entry point. The legacy rendering dependency is **ViewX**, not Vuex; it is now bundled internally.
 
-### Overview 🌐
+## Shape instructions
 
-`rhyform` library: Craft interactive math and graphical simulations with ease. Powered by `viewX` for diverse object support like Points, Lines, Curves, and more.
+Use `scene.circle(options)`, `scene.square(options)`, `scene.svg(markup, options)`, or `scene.shape(descriptor)` to create an initially hidden object. `rhyform.circle`, `rhyform.square`, `rhyform.path`, and `rhyform.procedural` create descriptors without adding a visible object.
 
-### Core Concepts 🧠
+Name the shape descriptions first, then write the animation sequence. A square's size and fill belong to its descriptor; transition duration belongs to `transformTo`. The source `shape` keeps its identity as it adopts a target's appearance. Reusing `circle` later returns it to the original description.
 
-- **Scene**: Your animation or interactive canvas.
-- **Space**: A 2D drawable area for objects.
-- **Camera**: Manages view and zoom in a space.
-- **Tags**: Logical grouping of objects within scenes/spaces.
+```js
+const bloom = rhyform.procedural(t => {
+  const a = t * Math.PI * 2;
+  const r = 1.5 + 0.35 * Math.cos(5 * a);
+  return [r * Math.cos(a), r * Math.sin(a)];
+}, { width: 4, fill: '#77aaa1' });
 
-### Object Types 📐
+shape.transformTo(bloom, { duration: 2 });
+shape.moveTo([2, 1], 1);
+shape.hide(0.5);
+```
 
-- **Point, Text, Line, Curve, Circle**: Basic drawable elements.
-- **Button**: Interactive element with click functionality.
-- **ValueSlider**: Numeric value adjuster.
-- **Audio**: Embed and control sound.
-- **Equation**: Render mathematical expressions.
-- **VectorImage**: SVG to drawable object converter.
+`draw`, `show`, `hide`, `transformTo`, and `moveTo` append timeline clips; their duration is in seconds. A clip's `.startNextImmediately()` starts the next clip at the same time. `scene.wait(seconds)` inserts a pause. Creation order is playback order. Describe a scene before playing it.
 
-### Object Creation 🏗️
-- `createScene`, `createSpaceInElement`, `createPoint`, `createText`, `createLine`, `createCurve`, `createCircle`, `createAudio`, `createButton`, `createSlider`: Functions to create various objects.
+Native shape descriptors accept `fill`, `stroke`, `strokeWidth`, and `at: [x, y]`. Circles use `radius`; squares use `size`. Paths and procedural curves fit to `width` (default 4). Procedural functions receive a parameter from 0 to 1 and return `[x, y]` or `{x, y}`; use `{closed: false}` for an open curve. SVG/path coordinates use the SVG downward Y axis and are converted to scene coordinates on import. Procedural functions can opt into `{coordinates: 'scene'}` for upward-positive Y. Placement and `moveTo` also use scene coordinates.
 
-### Utility Functions 🛠️
-- `hideElementsWithTag`, `showElementsWithTag`, `removeElementsWithTag`: Manage group animations in elements by tags.
+## SVG import and transformation
 
-### Detailed Object Descriptions 📖
+The fourth [motion study](examples/index.html#import-svg) imports the repository's existing `images/rhyform.svg`, draws all 23 paths, and moves the artwork while preserving its original Bézier/arc commands and colors. “Choose SVG…” lets you run the same sequence with a local file; the file is read in the browser and is never uploaded to a server.
 
-**Points, Lines, Curves, Circles, Text, Buttons, ValueSliders, Audio, Equations, Vector Images**: Construction, properties, and methods detailed for each object type.
+```js
+const scene = rhyform.scene('#stage');
+const artwork = await rhyform.loadSVG('./images/rhyform.svg', {
+  width: 4.5, scene
+});
+artwork.draw(2);
+artwork.moveTo([1.3, 0], 1.8);
+scene.slider('#controls');
+scene.play();
+```
 
+Use an async function or module script for `await`. URL loading needs a static HTTP server and same-origin/CORS access; the file-picker example reads `File.text()` and passes its SVG markup to `scene.svg(...)`.
 
-### Points
+```js
+const shape = scene.svg(sourceSVG, { width: 4 });
+shape.show(0.3);
+const animation = shape.transformTo({ svg: targetSVG, width: 4 }, {
+  duration: 2
+});
+console.log(animation.strategy); // "contour-morph"
 
-**Constructor and Properties:**
-- `Point(at, size, color)`: Creates a point at the specified coordinates with given size and color.
-    - `at`: Object specifying `x`, `y`, and optional `z` coordinates.
-    - `size`: Numerical value for the size of the point.
-    - `color`: String representing the color.
+// Alternatively, load a URL (same-origin or CORS-enabled).
+const loaded = await rhyform.loadSVG('./drawing.svg', { width: 4, scene });
+loaded.draw(1);
+```
 
-**Methods:**
-- `show(inSeconds)`: Shows the point over a specified time period.
-- `hide(inSeconds)`: Hides the point over a specified time period.
-- `place.at(x, y, z)`: Sets the point's location.
-- `loadWith.size(size)`: Changes the point's size.
-- `loadWith.color(color)`: Changes the point's color.
+SVGs and MathJax equations stay vector data. They are not rendered to PNG and traced again. The importer handles standard path commands (`M/L/H/V/C/S/Q/T/A/Z`, absolute and relative), circles, ellipses, rectangles, polygons, polylines, lines, nested group transforms, local `<use>` references, solid paints, and compound paths with `evenodd` or `nonzero` fills. It preserves imported endpoint path data and samples each contour separately for the intermediate frames. `data-key` on a path gives an explicit path correspondence; otherwise path order is used. Contours are matched by area and checked for nesting and winding compatibility.
 
-### Lines
+A morph needs matching path/contour structure and fill rules. Different structures reject with an actionable error. If a dissolve is appropriate, opt in explicitly:
 
-**Constructor and Properties:**
-- `Line(between, thickness, color)`: Creates a line between two points.
-    - `between`: An array of two Point objects.
-    - `thickness`: Numerical value for the thickness of the line.
-    - `color`: String representing the color.
+```js
+shape.transformTo(otherSVGDescriptor, {
+  duration: 1,
+  fallback: 'crossfade'
+});
+```
 
-**Methods:**
-- `show(inSeconds)`: Shows the line over a specified time period.
-- `hide(inSeconds)`: Hides the line over a specified time period.
+This is a constrained geometric correspondence, not universal semantic object matching. Arbitrary concave or self-intersecting inputs can still produce poor intermediate geometry. Split/merge choreography and topology-changing surface morphs are not implemented. Equation descriptors additionally support an explicit glyph-matching mode described below.
 
-### Curves
+The importer deliberately rejects unsupported artwork instead of silently flattening it: gradients, patterns, masks, clipping, filters, embedded text/images, CSS stylesheets/transforms, dashed strokes, non-scaling strokes, nested SVG viewports, group-opacity compositing across multiple children, and non-uniformly transformed strokes. Convert text/strokes to paths and flatten those features in the authoring tool first. Use numeric SVG user units. Limits are 2 MB of SVG markup, 256 drawable paths, 128 contours per path, and 1024 contours total. Imported markup is parsed inertly and never mounted as executable SVG.
 
-**Constructor and Properties:**
-- `Curve(points, thickness, color, fillcolor)`: Creates a bezier curve through a series of points.
-    - `points`: An array of Point objects.
-    - `thickness`: Numerical value for the thickness of the curve.
-    - `color`: String representing the color.
-    - `fillcolor`: String representing the fill color.
+## Playback and interaction
 
-**Methods:**
-- `show(inSeconds)`: Shows the curve over a specified time period.
-- `hide(inSeconds)`: Hides the curve over a specified time period.
+```js
+scene.prepare();      // Compile duration and initial state without playing.
+scene.seek(2.4);      // Seconds; pauses playback and samples the timeline.
+scene.resume();
+scene.pause();
+scene.play();         // Replay from the beginning.
+scene.clear();        // Remove objects/clips and cancel pending assets.
+scene.dispose();      // Also release this scene's space and resize observer.
+```
 
-### Circles
+The shared animation clock drives both legacy ViewX objects and new SVG shapes. Seeking is deterministic; `runFunction` callbacks run on playback boundary crossings, not on seeking. Callback side effects cannot be reversed by scrubbing. Audio is paused/resynchronized with playback; browser autoplay policy still applies.
 
-**Constructor and Properties:**
-- `Circle(at, radius)`: Creates a circle at a specified point with a given radius.
-    - `at`: A Point object for the center of the circle.
-    - `radius`: Numerical value for the radius of the circle.
+`scene.slider('#controls', {label: 'Progress'})` creates a keyboard-accessible native range control. Its return value has `input`, `element`, and `remove()`. This slider controls timeline time. Remove an individual control with `remove()`; `scene.dispose()` also removes its built-in sliders. The demos explicitly wait for the user to play, including with reduced-motion preferences.
 
-**Methods:**
-- `show(inSeconds)`: Shows the circle over a specified time period.
-- `hide(inSeconds)`: Hides the circle over a specified time period.
+For custom interfaces, `scene.onUpdate(listener)` returns an unsubscribe function; read `currentTime`, `duration`, `playing`, and `lastError`. Only one owner should write a shape's geometry at a time. Concurrent clips for different objects are supported; overlapping transforms on the same shape follow authored order.
 
-### Text
+## Live parameters and controls
 
-**Constructor and Properties:**
-- `Text(content)`: Creates a text object with the specified content.
-    - `content`: String or HTML content to display.
+The separate [interactive wave example](examples/controls.html) has amplitude and cycle sliders plus Play/Pause, Restart, and progress scrubbing. The controls come from the library; the example supplies their CSS.
 
-**Methods:**
-- `show(inSeconds)`: Shows the text over a specified time period.
-- `hide(inSeconds)`: Hides the text over a specified time period.
+```js
+const scene = rhyform.scene('#stage');
+const radius = scene.parameter('Radius', {
+  value: 1, min: 0.2, max: 2, step: 0.1
+});
+const circle = scene.liveShape(() =>
+  rhyform.circle({ radius: radius.value })
+);
+circle.show(0);
+scene.wait(8);
+scene.controls('#controls');
+```
 
-### Buttons
+`parameter.value = number` updates live geometry immediately, including while paused. Values snap to `step` from `min` and clamp to the range. `parameter.subscribe(listener)` returns an unsubscribe function. Parameters belong to their scene; after clearing or disposing it, writes reject.
 
-**Constructor and Properties:**
-- `Button(content, onClick)`: Creates an interactive button with the given content and click handler.
-    - `content`: String or HTML content to display.
-    - `onClick`: Function to execute on click event.
+`scene.liveShape(factory)` reevaluates its synchronous descriptor factory when a scene parameter or the timeline changes. Read `scene.currentTime` to drive motion, as the wave example does. Factories must be pure: read parameters without modifying them. Live shapes support `show` and `hide`; their factory owns geometry, so `draw`, `transformTo`, and `moveTo` reject instead of competing with it. Use an ordinary `scene.shape` for an authored morph sequence. This is direct reactive geometry, not a general dependency graph or constraint solver.
 
-**Methods:**
-- `show(inSeconds)`: Shows the button over a specified time period.
-- `hide(inSeconds)`: Hides the button over a specified time period.
+`scene.controls(container, {parameters, playback})` defaults to all existing scene parameters and `playback: true`. It returns `{element, inputs, remove()}`; `inputs` is a Map from parameters to their range inputs. Native HTML controls work without library CSS. Parameter changes leave time and playback alone; progress scrubbing pauses; Restart replays with the current parameter settings. Clear/dispose removes the control panel and live bindings. A custom interface can pass `playback: false` or a subset of parameters.
 
-### ValueSlider
+## Equation descriptors and matching
 
-**Constructor and Properties:**
-- `ValueSlider(at, width, min, max, value, step, sliderProperties)`: Creates a slider to adjust numeric values.
-    - `at`: Object specifying `x`, `y`, and optional `z` coordinates.
-    - `width`: The visual width of the slider.
-    - `min`: Minimum value of the slider.
-    - `max`: Maximum value of the slider.
-    - `value`: Initial value of the slider.
-    - `step`: Step size of the slider.
-    - `sliderProperties`: Object containing additional properties for customizing the appearance and behavior.
+MathJax's SVG output already contains vector glyph outlines. The equation path is **LaTeX → MathJax SVG → Rhyform contours → animation**. Potrace is only needed when converting raster pixels to outlines; equations never pass through a bitmap.
 
-**Methods:**
-- `show(inSeconds)`: Shows the slider over a specified time period.
-- `hide(inSeconds)`: Hides the slider over a specified time period.
+Load MathJax's SVG typesetter before authoring equations. For example, include a local copy of `mathjax/es5/tex-svg.js`, or the pinned CDN file shown here, after the Rhyform script:
 
-### Audio
+```html
+<script src="rhyform.js"></script>
+<script>
+  window.MathJax = {
+    svg: { fontCache: 'local' },
+    startup: { typeset: false }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+```
 
-**Constructor and Properties:**
-- `Audio(url)`: Creates an audio object that can be played, paused, and stopped.
-    - `url`: Source URL of the audio file.
+Inside an async function, describe the targets, then animate:
 
-**Methods:**
-- `play(from)`: Plays the audio from the specified timestamp.
-- `pause()`: Pauses the audio.
-- `stop()`: Stops and resets the audio.
-  
-### Equations
+```js
+const scene = rhyform.scene('#stage');
+const quadratic = await rhyform.equation('f(x)=x^2');
+const cubic = await rhyform.equation('f(x)=x^3');
+const equation = scene.shape(quadratic);
+equation.draw(1.6);
+equation.transformTo(cubic, { duration: 2.4 });
+scene.slider('#controls');
+scene.play();
+```
 
-**Constructor and Properties:**
-- `Equation(equationPoints, expression, at, width, color, fontSize)`: Creates an equation object that renders mathematical expressions.
-  - `equationPoints`: Array of points that make up the curves for equation rendering.
-  - `expression`: LaTeX or similar markup representing the mathematical expression.
-  - `at`: Object specifying `x`, `y`, and optional `z` coordinates where the expression starts.
-  - `width`: The width of the rendered expression.
-  - `color`: String representing the color of the expression.
-  - `fontSize`: Size of the font used in rendering the expression.
+`rhyform.equation(tex, {scene, width, at, color})` creates an invisible descriptor, like `rhyform.circle`. Defaults: active scene, width 4.5, center `[0,0]`, teal. It waits for MathJax startup and shares the cancellable typesetting queue. Use a local font cache (`local`, the MathJax 3 default, or `none`); references into a global SVG font cache outside the imported SVG are unsupported.
 
-**Methods:**
-- `show(inSeconds)`: Shows the rendered equation over the specified time period.
-- `hide(inSeconds)`: Hides the rendered equation over the specified time period.
+For equations that gain, lose, or rearrange glyphs, opt into structural matching:
 
-### Vector Images
+```js
+equation.transformTo(nextEquation, {
+  duration: 2.6, match: 'semantic'
+});
+```
 
-**Constructor and Properties:**
-- `VectorImage(url, at, color, fillcolor, width)`: Creates a vector image object from an SVG file.
-  - `url`: URL to the SVG file.
-  - `at`: Object specifying `x`, `y`, and optional `z` coordinates for the top-left corner of the image.
-  - `color`: String representing the stroke color of paths in the SVG.
-  - `fillcolor`: String representing the fill color of shapes in the SVG.
-  - `width`: The width of the rendered image relative to the space's units.
+Matching preserves MathJax's symbol identity and roles such as numerator, denominator, base, and exponent. A global minimum-cost assignment combines these with normalized outline similarity and position. It favours retaining identical symbols, then compatible replacements of the same mathematical type. Matched parts move/reshape with full opacity. Unmatched parts grow from or retract toward related symbols; incompatible contour topology also uses this geometric arrival/departure rule. Transitions do not crossfade.
 
-**Methods:**
-- `show(inSeconds)`: Shows the vector image over the specified time period.
-- `hide(inSeconds)`: Hides the vector image over the specified time period.
-- `draw(inSeconds)`: Draws the vector image stroke by stroke over the specified time period.
+The returned clip has `strategy: 'semantic-match'` and `correspondence: {matched, reshaped, entering, leaving, pairs}`. Each pair reports source/target path indices and glyph IDs so the chosen mapping is inspectable. This is a structural heuristic, not a computer algebra system: it does not infer the derivation, prove equivalence, or guarantee the intended term mapping. The caller authors the algebraic steps. Explicit term overrides, coherent whole-term grouping, split/merge provenance, and collision-free trajectories remain future work. A change in glyph topology may shrink and grow rather than continuously preserve its holes.
 
-### Animations
+For a simpler alternative, `{match: 'glyphs'}` matches identical glyphs by proximity and fades unmatched parts individually. The default remains strict contour correspondence; whole-asset crossfades require `{fallback: 'crossfade'}`. These are distinct, inspectable strategies.
 
-**Constructor and Properties:**
-- `Animation(start, end, duration, fps, animateImmediately, animOptions, type)`: Defines an animation for an object's properties over time.
-  - `start`: The animation's start time.
-  - `end`: The animation's end time.
-  - `duration`: The duration over which the animation occurs.
-  - `fps`: Frames per second for the animation.
-  - `animateImmediately`: Whether the next animation in a sequence should start immediately.
-  - `animOptions`: Additional options for the animation such as keyframes.
-  - `type`: Type of animation (viewX, HTML/CSS style, audio).
+Examples: [equation → equation](examples/index.html#equations), [π → disk → square → π](examples/index.html#math-to-shape), and [six-step fractional quadratic derivation](examples/index.html#algebra). The π example has compatible single-contour geometry and uses true contour morphs. A whole multi-glyph equation into an arbitrary solid shape still needs a correspondence recipe or an explicit `fallback: 'crossfade'`.
 
-**Methods:**
-- `startNextImmediately()`: Starts the next animation in the sequence immediately.
+## Existing scenes and optional dependencies
 
-### AnimationGroup
+The older `createScene`, `createSpaceInElement`, points, lines, circles, curves, text, tags, and `.change.*` authoring style remains available. Remove old separate ViewX/Potrace script tags for scenes that only need SVG/geometry. `scene.play(index)` retains its animation-index argument; use `scene.seek(seconds)` for time-based scrubbing.
 
-**Constructor and Properties:**
-- `AnimationGroup()`: A container for a group of animations that can be controlled together.
+Important differences:
 
-**Methods:**
-- `addAnim(animation)`: Adds an animation to the group.
-- `startNextImmediately()`: Sets the group to start the next animation immediately after the current one finishes.
+- `generateEquation` and `generateVectorImage` now return a native SVG shape, not a wrapper containing traced `.curves`. `show`, `hide`, `draw`, tags, `.change.expression`, and `.change.url` remain available. Code that reaches into old traced-curve internals must migrate.
+- New shape `draw(seconds)` and generated asset `draw(seconds)` take duration. Legacy line/curve `draw(speed)` still takes drawing speed.
+- Legacy curves accept Points, `[x,y]`, `{x,y}`, or `{command:'M'|'L',x,y}`. Empty curves fail clearly. Use `createSVG` for Bézier/arc data.
+- Existing line/curve endpoints are authored snapshots, not reactive constraints bound to moving Points. Update their geometry explicitly.
+- Legacy constructors still use the active scene. Prefer `scene.shape` / `scene.svg` when constructing multiple independent scenes.
 
-### Utility Functions
+**Equations:** load MathJax with SVG output before calling `generateEquation`; pending `MathJax.startup.promise` is awaited. The original-scene example uses MathJax 3.2.2. MathJax is an optional external dependency, not in the Rhyform bundle.
 
-**General Utility Functions:**
-- `runFunction(func, inSeconds)`: Runs a custom function as part of an animation at a certain point in time.
-- `wait(forSeconds)`: Delays the next animation by a specified number of seconds.
-- `hideShowTagGroup(type, tag, inSeconds)`: Helper function to hide or show a group of elements with the same tag.
+```js
+const equation = await rhyform.generateEquation('a^2+b^2', {x: -2, y: 1}, '#247d78', 2);
+equation.show(0.4);
+const change = await equation.change.expression('a^2+b^2=c^2', 1);
+```
 
-### Miscellaneous
+Concurrent equation generation is queued. Typesetter errors reject. Legacy expression/URL changes allow a crossfade when contour topology differs; inspect the returned animation's `strategy`. Numeric legacy font sizes are interpreted as multiples of 16 CSS pixels; explicit pixel strings such as `'24px'` also work.
 
-- To remove all elements with a specific tag, use `removeElementsWithTag(tag)` or its alias `deleteElementsWithTag(tag)`.
-- To retrieve parts 1 and 2 of the documentation or other specific sections, you can refer to specific prompts or the index of the full documentation.
+**Raster images:** `generateVectorImage(url, at, stroke, fill, width)` uses an optional Potrace-compatible adapter only for bitmaps. Configure it with `rhyform.configure({potrace: adapter})`; a preloaded `window.Potrace` is also accepted. The adapter supplies `setParameter`, `loadImageFromUrl`, `process(callback)`, and `getSVG`.
+
+Raster jobs are serialized, decoded with explicit failures, limited to 4 megapixels/8 MB, and bounded by a 10-second operation timeout. A cancelled/timed-out running singleton must be replaced with a fresh adapter instance before retrying. The adapter runs on the main thread: a timeout cannot preempt synchronous tracing CPU work. Potrace extracts silhouettes; it cannot recover SVG layers or semantic shape correspondences. No tracer is bundled or automatically downloaded. Review the chosen adapter's license for your application.
+
+## Develop and verify
+
+```sh
+npm ci
+npm run build
+npm test
+npm run demo
+# Open http://127.0.0.1:8769/examples/
+```
+
+Node.js 22+ and npm are development tools only. `npm test` uses installed Chrome, or Playwright Chromium (`npx playwright install chromium`). Additional engines:
+
+```sh
+npx playwright install firefox webkit
+TEST_BROWSER=firefox node tests/run.mjs
+TEST_BROWSER=webkit node tests/run.mjs
+npm run check:release
+```
+
+Edit `src/`; `scripts/build.mjs` regenerates both root bundles. The build scopes legacy scratch variables inside factories to avoid leaking them onto `window`. ViewX is pinned in `vendor/` with small local compatibility fixes. Its inherited string-based interaction hooks still produce esbuild direct-eval warnings; those hooks are outside the supported Rhyform API. No CDN code is loaded by the core, geometry/SVG studies, or controls example. Equation studies lazily load MathJax 3.2.2, preferring the local development copy and falling back to the pinned CDN.
+
+CI installs from the lockfile, checks consistent release versions and embedded license notices, verifies that supplied bundles exactly reproduce from source, and runs the browser suite. `check:release` also checks the publication file list for ignored artifacts and common private-content patterns; it complements manual review and is not a comprehensive secret scanner. npm publication is disabled by `private: true`; tagged GitHub releases distribute the browser files.
+
+The repair is a tested 2D baseline, not a claim that every historical consumer or SVG feature works. Three-dimensional geometry/rendering, natural-language interpretation, semantic split/merge, and a general reactive constraint solver are not in this version.
+
+## License
+
+MIT. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Vendored ViewX and svgpath notices are also embedded in both bundles.

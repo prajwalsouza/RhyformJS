@@ -1,0 +1,9 @@
+# Local investigation, development plans, and diagnostic artifacts.
+/planning-and-development/
+/node_modules/
+/test-results/
+/playwright-report/
+.DS_Store
+.env
+.env.*
+!.env.example
