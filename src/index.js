@@ -9,7 +9,7 @@ const viewX = createViewX();
 const api = createLegacy(viewX, svgTools, installTimeline);
 installShapes(api, viewX);
 installAssets(api);
-api.version = '0.3.0';
+api.version = '0.3.1';
 // Deterministic geometry helpers are public for custom procedural authoring and tests.
 api.geometry = { parseSVG: svgTools.parseSVG, fit: svgTools.fitAsset, prepareMorph: svgTools.prepareMorph };
 export default api;

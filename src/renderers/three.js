@@ -18,6 +18,7 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { positive, vector } from "../geometry3d.js";
+import { createViewRotation } from "../view-rotation3d.js";
 
 export function createThreeRenderer(host, options = {}) {
   const viewHeight = positive(options.viewHeight ?? 6.5, "viewHeight");
@@ -59,6 +60,9 @@ export function createThreeRenderer(host, options = {}) {
     options.description ?? "Three-dimensional mathematical animation",
   );
   host.append(canvas);
+  const viewRotation = options.rotateOnPause === false
+    ? null
+    : createViewRotation(canvas, cameraState, options.onViewChange);
   let width = 0,
     height = 0,
     draws = 0,
@@ -215,7 +219,7 @@ export function createThreeRenderer(host, options = {}) {
   function render(objects) {
     if (disposed || lost) return;
     for (const object of objects) sync(object);
-    camera.position.fromArray(cameraState.at);
+    camera.position.fromArray(viewRotation?.position() ?? cameraState.at);
     camera.lookAt(new Vector3().fromArray(cameraState.lookAt));
     camera.updateMatrixWorld();
     renderer.render(world, camera);
@@ -237,6 +241,11 @@ export function createThreeRenderer(host, options = {}) {
   return {
     canvas,
     cameraState,
+    setPlaying(playing) {
+      if (playing) viewRotation?.reset();
+      viewRotation?.setEnabled(!playing);
+    },
+    resetView() { viewRotation?.reset(); },
     render,
     resize,
     removeObject,
@@ -250,7 +259,7 @@ export function createThreeRenderer(host, options = {}) {
       pickTests: 0,
     }),
     project(point) {
-      camera.position.fromArray(cameraState.at);
+      camera.position.fromArray(viewRotation?.position() ?? cameraState.at);
       camera.lookAt(new Vector3().fromArray(cameraState.lookAt));
       camera.updateMatrixWorld();
       const p = new Vector3(...vector(point)).project(camera);
@@ -264,6 +273,7 @@ export function createThreeRenderer(host, options = {}) {
     },
     dispose() {
       if (disposed) return;
+      viewRotation?.dispose();
       for (const o of [...resources.keys()]) removeObject(o);
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestored);

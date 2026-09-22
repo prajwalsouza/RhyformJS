@@ -306,7 +306,10 @@ await test('parameters update live geometry while paused, through keyboard input
   await page.getByRole('button',{name:'Play scene',exact:true}).click();await wait(140);
   const live=await run(()=>{amplitude.value=.5;return {width:shape.bounds.xmax-shape.bounds.xmin,playing:s.playing,time:s.currentTime,error:s.lastError?.message};});
   assert.ok(Math.abs(live.width-1)<1e-9&&live.playing&&live.time>.25,JSON.stringify(live));
-  await page.getByRole('button',{name:'Pause scene',exact:true}).click();
+  const pauseBox=await page.getByRole('button',{name:'Pause scene',exact:true}).boundingBox();
+  await page.mouse.move(pauseBox.x+pauseBox.width/2,pauseBox.y+pauseBox.height/2);
+  await page.mouse.down();await wait(120);await page.mouse.up();
+  await page.waitForFunction(()=>!s.playing);
   const time=await run(()=>s.currentTime);await wait(80);assert.equal(await run(()=>s.currentTime),time);
   assert.equal(await run(()=>{s.seek(.4);const at=shape.element.innerHTML;s.seek(.8);s.seek(.4);return at===shape.element.innerHTML;}),true);
   await page.getByRole('button',{name:'Restart',exact:true}).click();

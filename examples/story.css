@@ -228,3 +228,6 @@ summary:focus-visible {
   font-size: 14px;
   display: inline-block;
 }
+
+.view-hint { font-size: .72rem; color: #53635e; text-align: center; margin: .5rem 0; }
+#stage canvas:focus-visible { outline: 2px solid #257869; outline-offset: -3px; }

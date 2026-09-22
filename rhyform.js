@@ -7659,7 +7659,8 @@ var rhyform = (() => {
         restart.addEventListener("click", reset);
         cleanup.push(() => play.removeEventListener("click", toggle), () => restart.removeEventListener("click", reset));
         const update = () => {
-          play.textContent = scene.playing ? "Pause" : "Play";
+          const label = scene.playing ? "Pause" : "Play";
+          if (play.textContent !== label) play.textContent = label;
           play.setAttribute("aria-label", scene.playing ? "Pause scene" : "Play scene");
         };
         cleanup.push(scene.onUpdate(update));
@@ -8167,7 +8168,7 @@ var rhyform = (() => {
   var api = legacy_default(viewX2, svg_exports, installLegacyTimeline);
   installShapes(api, viewX2);
   installAssets(api);
-  api.version = "0.3.0";
+  api.version = "0.3.1";
   api.geometry = { parseSVG, fit: fitAsset, prepareMorph };
   var index_default = api;
   return __toCommonJS(index_exports);

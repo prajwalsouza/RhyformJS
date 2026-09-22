@@ -7693,7 +7693,8 @@ function installSceneControls(scene) {
       restart.addEventListener("click", reset);
       cleanup.push(() => play.removeEventListener("click", toggle), () => restart.removeEventListener("click", reset));
       const update = () => {
-        play.textContent = scene.playing ? "Pause" : "Play";
+        const label = scene.playing ? "Pause" : "Play";
+        if (play.textContent !== label) play.textContent = label;
         play.setAttribute("aria-label", scene.playing ? "Pause scene" : "Play scene");
       };
       cleanup.push(scene.onUpdate(update));
@@ -8201,7 +8202,7 @@ var viewX2 = viewx_default();
 var api = legacy_default(viewX2, svg_exports, installLegacyTimeline);
 installShapes(api, viewX2);
 installAssets(api);
-api.version = "0.3.0";
+api.version = "0.3.1";
 api.geometry = { parseSVG, fit: fitAsset, prepareMorph };
 var index_default = api;
 
@@ -38689,6 +38690,123 @@ var Line2 = class extends LineSegments2 {
   }
 };
 
+// src/view-rotation3d.js
+function createViewRotation(canvas, cameraState, invalidate) {
+  let enabled = false, pointer = null, lastX = 0, lastY = 0, yaw = 0, pitch = 0;
+  const original = {
+    cursor: canvas.style.cursor,
+    touchAction: canvas.style.touchAction,
+    tabIndex: canvas.getAttribute("tabindex"),
+    description: canvas.getAttribute("aria-description"),
+    shortcuts: canvas.getAttribute("aria-keyshortcuts")
+  };
+  const restore = (attribute, value2) => value2 === null ? canvas.removeAttribute(attribute) : canvas.setAttribute(attribute, value2);
+  function spherical() {
+    const delta = cameraState.at.map((n, i) => n - cameraState.lookAt[i]);
+    const radius = Math.hypot(...delta);
+    return {
+      radius,
+      theta: Math.atan2(delta[0], delta[2]),
+      phi: Math.acos(Math.max(-1, Math.min(1, delta[1] / radius)))
+    };
+  }
+  function rotate(dx, dy) {
+    const { phi } = spherical();
+    yaw = (yaw + dx) % (2 * Math.PI);
+    pitch = Math.max(0.02, Math.min(Math.PI - 0.02, phi + pitch + dy)) - phi;
+    invalidate();
+  }
+  function finish(event2) {
+    if (pointer === null || event2 && event2.pointerId !== pointer) return;
+    const id = pointer;
+    pointer = null;
+    canvas.removeEventListener("pointermove", move);
+    canvas.removeEventListener("pointerup", finish);
+    canvas.removeEventListener("pointercancel", finish);
+    canvas.removeEventListener("lostpointercapture", finish);
+    if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
+    canvas.style.cursor = enabled ? "grab" : original.cursor;
+  }
+  function move(event2) {
+    if (event2.pointerId !== pointer) return;
+    const scale2 = 2 * Math.PI / Math.max(1, canvas.clientHeight);
+    rotate(-(event2.clientX - lastX) * scale2, -(event2.clientY - lastY) * scale2);
+    lastX = event2.clientX;
+    lastY = event2.clientY;
+  }
+  function down(event2) {
+    if (!enabled || pointer !== null || !event2.isPrimary || event2.button !== 0) return;
+    canvas.setPointerCapture(event2.pointerId);
+    pointer = event2.pointerId;
+    lastX = event2.clientX;
+    lastY = event2.clientY;
+    canvas.addEventListener("pointermove", move);
+    canvas.addEventListener("pointerup", finish);
+    canvas.addEventListener("pointercancel", finish);
+    canvas.addEventListener("lostpointercapture", finish);
+    canvas.style.cursor = "grabbing";
+    canvas.focus({ preventScroll: true });
+    event2.preventDefault();
+  }
+  function key2(event2) {
+    if (event2.altKey || event2.ctrlKey || event2.metaKey) return;
+    const step = Math.PI / 36;
+    const directions = {
+      ArrowLeft: [step, 0],
+      ArrowRight: [-step, 0],
+      ArrowUp: [0, -step],
+      ArrowDown: [0, step]
+    };
+    if (directions[event2.key]) rotate(...directions[event2.key]);
+    else if (event2.key === "Home" || event2.key === "Escape") reset();
+    else return;
+    event2.preventDefault();
+  }
+  function reset() {
+    finish();
+    if (yaw !== 0 || pitch !== 0) {
+      yaw = pitch = 0;
+      invalidate();
+    }
+  }
+  function setEnabled(next) {
+    if (next === enabled) return;
+    enabled = next;
+    if (enabled) {
+      canvas.addEventListener("pointerdown", down);
+      canvas.addEventListener("keydown", key2);
+      canvas.style.cursor = "grab";
+      canvas.style.touchAction = "pinch-zoom";
+      canvas.setAttribute("tabindex", "0");
+      canvas.setAttribute("aria-description", "Drag or use arrow keys to rotate the paused view. Home resets it. Playing restores the authored view. Zoom and pan are disabled.");
+      canvas.setAttribute("aria-keyshortcuts", "ArrowLeft ArrowRight ArrowUp ArrowDown Home Escape");
+    } else {
+      finish();
+      canvas.removeEventListener("pointerdown", down);
+      canvas.removeEventListener("keydown", key2);
+      canvas.style.cursor = original.cursor;
+      canvas.style.touchAction = original.touchAction;
+      restore("tabindex", original.tabIndex);
+      restore("aria-description", original.description);
+      restore("aria-keyshortcuts", original.shortcuts);
+    }
+  }
+  return {
+    setEnabled,
+    reset,
+    position() {
+      if (yaw === 0 && pitch === 0) return cameraState.at;
+      const { radius, theta, phi } = spherical();
+      const angle2 = Math.max(0.02, Math.min(Math.PI - 0.02, phi + pitch));
+      const ring = radius * Math.sin(angle2);
+      return [ring * Math.sin(theta + yaw), radius * Math.cos(angle2), ring * Math.cos(theta + yaw)].map((n, i) => n + cameraState.lookAt[i]);
+    },
+    dispose() {
+      setEnabled(false);
+    }
+  };
+}
+
 // src/renderers/three.js
 function createThreeRenderer(host, options2 = {}) {
   const viewHeight = positive(options2.viewHeight ?? 6.5, "viewHeight");
@@ -38723,6 +38841,7 @@ function createThreeRenderer(host, options2 = {}) {
     options2.description ?? "Three-dimensional mathematical animation"
   );
   host.append(canvas);
+  const viewRotation = options2.rotateOnPause === false ? null : createViewRotation(canvas, cameraState, options2.onViewChange);
   let width = 0, height = 0, draws = 0, lost = false, disposed = false;
   function resize() {
     const nextWidth = Math.max(1, host.clientWidth), nextHeight = Math.max(1, host.clientHeight);
@@ -38859,7 +38978,7 @@ function createThreeRenderer(host, options2 = {}) {
   function render(objects) {
     if (disposed || lost) return;
     for (const object of objects) sync(object);
-    camera.position.fromArray(cameraState.at);
+    camera.position.fromArray(viewRotation?.position() ?? cameraState.at);
     camera.lookAt(new Vector3().fromArray(cameraState.lookAt));
     camera.updateMatrixWorld();
     renderer.render(world, camera);
@@ -38881,6 +39000,13 @@ function createThreeRenderer(host, options2 = {}) {
   return {
     canvas,
     cameraState,
+    setPlaying(playing) {
+      if (playing) viewRotation?.reset();
+      viewRotation?.setEnabled(!playing);
+    },
+    resetView() {
+      viewRotation?.reset();
+    },
     render,
     resize,
     removeObject,
@@ -38894,7 +39020,7 @@ function createThreeRenderer(host, options2 = {}) {
       pickTests: 0
     }),
     project(point) {
-      camera.position.fromArray(cameraState.at);
+      camera.position.fromArray(viewRotation?.position() ?? cameraState.at);
       camera.lookAt(new Vector3().fromArray(cameraState.lookAt));
       camera.updateMatrixWorld();
       const p2 = new Vector3(...vector(point)).project(camera);
@@ -38907,6 +39033,7 @@ function createThreeRenderer(host, options2 = {}) {
     },
     dispose() {
       if (disposed) return;
+      viewRotation?.dispose();
       for (const o of [...resources.keys()]) removeObject(o);
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestored);
@@ -38995,7 +39122,8 @@ function createScene3D(selector, options2 = {}, assets) {
     },
     onContextRestored() {
       invalidate();
-    }
+    },
+    onViewChange: invalidate
   });
   function flush() {
     if (sampling || clearing || scene.disposed) return;
@@ -39052,6 +39180,7 @@ function createScene3D(selector, options2 = {}, assets) {
     },
     clear() {
       clearing = true;
+      renderer.resetView();
       for (const object of [...objects]) object.remove();
       for (const slider of [...sliders]) slider.remove();
       clearing = false;
@@ -39064,6 +39193,15 @@ function createScene3D(selector, options2 = {}, assets) {
       renderer.dispose();
     }
   });
+  scene.onUpdate(() => renderer.setPlaying(scene.playing));
+  renderer.setPlaying(false);
+  const resume = scene.resume;
+  scene.resume = () => {
+    if (scene.disposed) throw Error("Scene is disposed");
+    renderer.resetView();
+    flush();
+    return resume();
+  };
   const live = installSceneControls(scene);
   const observer = new ResizeObserver(() => {
     if (!scene.disposed && renderer.resize()) invalidate();
@@ -39642,6 +39780,12 @@ function createScene3D(selector, options2 = {}, assets) {
   };
   let cameraTarget = [...renderer.cameraState.at];
   scene.camera = {
+    resetView() {
+      if (scene.disposed) throw Error("Scene is disposed");
+      renderer.resetView();
+      flush();
+      return this;
+    },
     moveTo(at, value2 = 1) {
       const from = [...cameraTarget], to = vector(at, "camera position");
       if (Math.hypot(...to.map((n, i) => n - renderer.cameraState.lookAt[i])) < 1e-6)

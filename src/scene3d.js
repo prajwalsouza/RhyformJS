@@ -56,6 +56,7 @@ export function createScene3D(selector, options = {}, assets) {
     onContextRestored() {
       invalidate();
     },
+    onViewChange: invalidate,
   });
   function flush() {
     if (sampling || clearing || scene.disposed) return;
@@ -113,6 +114,7 @@ export function createScene3D(selector, options = {}, assets) {
     },
     clear() {
       clearing = true;
+      renderer.resetView();
       for (const object of [...objects]) object.remove();
       for (const slider of [...sliders]) slider.remove();
       clearing = false;
@@ -125,6 +127,15 @@ export function createScene3D(selector, options = {}, assets) {
       renderer.dispose();
     },
   });
+  scene.onUpdate(() => renderer.setPlaying(scene.playing));
+  renderer.setPlaying(false);
+  const resume = scene.resume;
+  scene.resume = () => {
+    if (scene.disposed) throw Error("Scene is disposed");
+    renderer.resetView();
+    flush();
+    return resume();
+  };
   const live = installSceneControls(scene);
   const observer = new ResizeObserver(() => {
     if (!scene.disposed && renderer.resize()) invalidate();
@@ -797,6 +808,12 @@ export function createScene3D(selector, options = {}, assets) {
   };
   let cameraTarget = [...renderer.cameraState.at];
   scene.camera = {
+    resetView() {
+      if (scene.disposed) throw Error("Scene is disposed");
+      renderer.resetView();
+      flush();
+      return this;
+    },
     moveTo(at, value = 1) {
       const from = [...cameraTarget],
         to = vector(at, "camera position");

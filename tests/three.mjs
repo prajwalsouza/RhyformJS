@@ -449,7 +449,7 @@ await test("a failed update cannot lock rendering, and disposed scenes reject sa
   });
   assert.ok(errors.every((e) => /disposed/.test(e)));
 });
-await test("minified distribution draws without loading extra scripts or pointer handlers", async (p) => {
+await test("minified distribution can opt out of view rotation without installing pointer handlers", async (p) => {
   await p.goto(base + "/tests/fixture-3d.html");
   const r = await p.evaluate(async () => {
     const script = document.createElement("script");
@@ -466,7 +466,7 @@ await test("minified distribution draws without loading extra scripts or pointer
       return original.call(this, type, ...args);
     };
     try {
-      const s = rhyform.scene("#stage", { dimensions: 3 });
+      const s = rhyform.scene("#stage", { dimensions: 3, rotateOnPause: false });
       s.cube().draw(1);
       s.seek(0.5);
       return { objects: s.stats().objects, registrations };
@@ -476,6 +476,125 @@ await test("minified distribution draws without loading extra scripts or pointer
   });
   assert.equal(r.objects, 1);
   assert.deepEqual(r.registrations, []);
+});
+async function dragScene(page, { dx = 70, dy = 25, button = "left" } = {}) {
+  const box = await page.locator("#stage canvas").boundingBox();
+  const x = box.x + box.width / 2, y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down({ button });
+  await page.mouse.move(x + dx, y + dy, { steps: 4 });
+  await page.mouse.up({ button });
+}
+await test("paused dragging changes only the view and resume restores the sampled camera immediately", async (p) => {
+  const before = await p.evaluate(() => {
+    window.s = rhyform.scene("#stage", { dimensions: 3 });
+    window.c = s.cube();
+    c.show(0);
+    s.camera.moveTo([-5, 3, 8], 4);
+    s.wait(5);
+    s.seek(2);
+    return { projection: s.project([1, 1, 1]), pose: c.snapshot(), time: s.currentTime };
+  });
+  await dragScene(p);
+  const after = await p.evaluate(() => ({ projection: s.project([1, 1, 1]), pose: c.snapshot(), time: s.currentTime }));
+  assert.notDeepEqual(after.projection, before.projection);
+  assert.deepEqual(after.pose, before.pose);
+  assert.equal(after.time, before.time);
+  await p.waitForTimeout(100);
+  const draws = await p.evaluate(() => s.stats().draws);
+  await p.waitForTimeout(100);
+  assert.equal(await p.evaluate(() => s.stats().draws), draws, "rotation must not create an idle render loop");
+  const resumed = await p.evaluate(() => { s.resume(); return { projection: s.project([1, 1, 1]), time: s.currentTime, playing: s.playing }; });
+  assert.deepEqual(resumed, { projection: before.projection, time: before.time, playing: true });
+  await p.evaluate(() => s.seek(2));
+  assert.deepEqual(await p.evaluate(() => s.project([1, 1, 1])), before.projection);
+});
+await test("view inspection has no zoom or pan, is disabled during playback, and works again when paused", async (p) => {
+  await p.evaluate(() => {
+    window.s = rhyform.scene("#stage", { dimensions: 3, projection: "perspective", camera: { at: [5, 3, 8], lookAt: [1, 0, 0] } });
+    s.cube().show(0); s.wait(10); s.seek(1);
+  });
+  const project = () => p.evaluate(() => [[1, 0, 0], [1, 1, 1], [-1, 0, 0]].map(point => s.project(point)));
+  const before = await project();
+  await dragScene(p, { button: "right" });
+  await p.mouse.wheel(0, 200);
+  await p.waitForTimeout(100);
+  assert.deepEqual(await project(), before);
+  await dragScene(p);
+  const rotated = await project();
+  assert.notDeepEqual(rotated, before);
+  for (const key of ["x", "y", "depth"]) assert.ok(Math.abs(rotated[0][key] - before[0][key]) < 1e-9, "orbit center and distance must stay fixed");
+  await p.evaluate(() => s.resume());
+  await dragScene(p);
+  await p.keyboard.press("ArrowRight");
+  assert.deepEqual(await project(), before);
+  assert.equal(await p.evaluate(() => s.canvas.style.touchAction), "");
+  await p.evaluate(() => s.pause());
+  await dragScene(p);
+  assert.notDeepEqual(await project(), before);
+  await p.evaluate(() => s.camera.resetView());
+  assert.deepEqual(await project(), before);
+  if (engine === "chromium") {
+    // Browser-delivered touch events exercise the same capture path on mobile.
+    const touch = await p.context().newCDPSession(p);
+    await touch.send("Emulation.setTouchEmulationEnabled", { enabled: true });
+    await touch.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: 300, y: 200 }] });
+    await touch.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: 345, y: 215 }] });
+    await touch.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    assert.notDeepEqual(await project(), before);
+    await p.evaluate(() => s.camera.resetView());
+    assert.deepEqual(await project(), before);
+    await touch.detach();
+  }
+  await dragScene(p);
+  assert.deepEqual(await p.evaluate(() => { s.play(); return [[1, 0, 0], [1, 1, 1], [-1, 0, 0]].map(point => s.project(point)); }), before);
+});
+await test("keyboard rotation clamps the poles and Home restores the view without changing time", async (p) => {
+  await p.evaluate(() => { window.s = rhyform.scene("#stage", { dimensions: 3 }); s.cube().show(0); s.wait(1); s.seek(1); });
+  const before = await p.evaluate(() => s.project([1, 1, 1]));
+  const canvas = p.locator("#stage canvas");
+  await canvas.focus();
+  await p.keyboard.press("ArrowRight");
+  assert.notDeepEqual(await p.evaluate(() => s.project([1, 1, 1])), before);
+  for (let i = 0; i < 80; i++) await p.keyboard.press("ArrowUp");
+  const up = await p.evaluate(() => s.project([1, 1, 1]));
+  assert.ok([up.x, up.y, up.depth].every(Number.isFinite));
+  await p.keyboard.press("ArrowUp");
+  assert.deepEqual(await p.evaluate(() => s.project([1, 1, 1])), up);
+  await p.keyboard.press("Home");
+  assert.deepEqual(await p.evaluate(() => ({ project: s.project([1, 1, 1]), time: s.currentTime })), { project: before, time: 1 });
+});
+await test("resuming during a captured drag cancels it and clear/dispose clean up all view listeners", async (p) => {
+  await p.evaluate(() => {
+    window.registeredViewEvents = new Map();
+    const add = EventTarget.prototype.addEventListener, remove = EventTarget.prototype.removeEventListener;
+    EventTarget.prototype.addEventListener = function (type, fn, ...rest) {
+      if (this instanceof HTMLCanvasElement && /^(pointer|lostpointer|keydown)/.test(type)) {
+        if (!registeredViewEvents.has(type)) registeredViewEvents.set(type, new Set());
+        registeredViewEvents.get(type).add(fn);
+      }
+      return add.call(this, type, fn, ...rest);
+    };
+    EventTarget.prototype.removeEventListener = function (type, fn, ...rest) {
+      if (this instanceof HTMLCanvasElement && /^(pointer|lostpointer|keydown)/.test(type)) registeredViewEvents.get(type)?.delete(fn);
+      return remove.call(this, type, fn, ...rest);
+    };
+    window.s = rhyform.scene("#stage", { dimensions: 3 }); s.cube().show(0); s.wait(10); s.seek(1);
+  });
+  const before = await p.evaluate(() => s.project([1, 1, 1]));
+  await p.mouse.move(300, 200); await p.mouse.down(); await p.mouse.move(410, 240);
+  assert.notDeepEqual(await p.evaluate(() => s.project([1, 1, 1])), before);
+  await p.evaluate(() => { s.resume(); s.pause(); });
+  await p.mouse.move(800, 500); await p.mouse.up();
+  assert.deepEqual(await p.evaluate(() => s.project([1, 1, 1])), before);
+  await dragScene(p);
+  assert.notDeepEqual(await p.evaluate(() => s.project([1, 1, 1])), before);
+  await p.evaluate(() => s.clear());
+  assert.deepEqual(await p.evaluate(() => s.project([1, 1, 1])), before);
+  await p.mouse.move(300, 200); await p.mouse.down(); await p.mouse.move(400, 230);
+  await p.evaluate(() => s.dispose());
+  await p.mouse.up();
+  assert.equal(await p.evaluate(() => [...registeredViewEvents.values()].reduce((n, listeners) => n + listeners.size, 0)), 0);
 });
 await test("box assembly honors all dimensions and unsupported colors cannot silently turn white", async (p) => {
   const r = await p.evaluate(() => {

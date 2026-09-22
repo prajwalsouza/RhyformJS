@@ -509,13 +509,15 @@ function highlight(code) {
 }
 function update() {
   if (!current) return;
-  $("play").replaceChildren(
-    document.createTextNode(current.playing ? "Pause scene" : "Play scene"),
-  );
-  const icon = document.createElement("span");
-  icon.setAttribute("aria-hidden", "true");
-  icon.textContent = current.playing ? "Ⅱ" : "▶";
-  $("play").append(icon);
+  $("view-hint").textContent = current.playing ? "Pause to look around" : "Drag to look around · Play restores the view";
+  const playLabel = current.playing ? "Pause scene" : "Play scene";
+  if ($("play").firstChild?.textContent !== playLabel) {
+    $("play").replaceChildren(document.createTextNode(playLabel));
+    const icon = document.createElement("span");
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = current.playing ? "Ⅱ" : "▶";
+    $("play").append(icon);
+  }
   $("play-state").textContent = current.playing
     ? "Playing"
     : current.currentTime >= current.duration

@@ -1,6 +1,16 @@
 # Changelog
 
-## v0.3.0
+## v0.3.1
+
+- Enable drag-to-rotate inspection by default while a 3D scene is paused, including after it ends. Rotation orbits the camera target at a fixed distance; zoom and pan are disabled.
+- Restore the authored camera view immediately on Play, Resume, or Replay. Inspection does not change geometry, camera clips, or scene time.
+- Add arrow-key rotation, Home/Escape reset, `scene.camera.resetView()`, and the scene option `rotateOnPause: false`. Rotation uses on-demand rendering and disconnects its listeners during playback and on disposal.
+- Add rotation guidance to all 3D studies and the complete story, plus pointer, keyboard, playback, projection, and lifecycle regression checks.
+- Keep playback button contents stable between pointer down/up instead of replacing them each animation frame. The controls regression waits for the pause state before measuring frozen time.
+
+The `v0.3.0` tag remains unchanged. Its GitHub release was not published before these follow-up controls were requested; use `v0.3.1` for the complete 3D release.
+
+## v0.3.0 (tagged candidate)
 
 - Add an optional self-contained Three.js distribution (`rhyform-3d.js`, its minified counterpart, and a browser ES module). Existing 2D bundles remain independent of Three.js.
 - Add parametric XYZ curves, sampled surfaces, fills between curves, lofts, revolutions, tubes, ribbons, planar fills with holes, and extrusion.

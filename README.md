@@ -4,13 +4,13 @@ Small instructions for mathematical animation in the browser. Draw a shape, tran
 
 Inspired by Manim's mathematical storytelling, with browser interaction as a first-class part of the scene.
 
-Version **0.3.0** adds GPU 3D scenes, parametric surfaces, tag trees, and extruded equations. Start with [A change of sign](examples/story.html), a complete mathematical story, or explore the [3D studies](examples/three.html) and [3D guide](docs/3d.md). See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
+Version **0.3.1** includes GPU 3D scenes, parametric surfaces, tag trees, and extruded equations. Paused 3D scenes let readers drag to rotate; Play restores the authored view, with zoom disabled. Start with [A change of sign](examples/story.html), a complete mathematical story, or explore the [3D studies](examples/three.html) and [3D guide](docs/3d.md). See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.3.0/rhyform.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.3.1/rhyform.min.js"></script>
 ```
 
-You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.3.0) and serve them locally. All bundles embed their license notices. For 3D, use `rhyform-3d.min.js` or the native module `rhyform-3d.module.js`; the smaller `rhyform.min.js` remains 2D-only.
+You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.3.1) and serve them locally. All bundles embed their license notices. For 3D, use `rhyform-3d.min.js` or the native module `rhyform-3d.module.js`; the smaller `rhyform.min.js` remains 2D-only.
 
 [Open the motion studies](examples/index.html) for runnable code beside each animation, including SVG imports and equation transforms. [Interactive controls](examples/controls.html) demonstrates live parameters and built-in transport. [The original Pythagoras scene](examples/legacy-pythagoras.html) demonstrates the older fluent API on the updated runtime.
 

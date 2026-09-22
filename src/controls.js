@@ -58,7 +58,12 @@ export function installSceneControls(scene) {
       const reset = () => scene.play();
       play.addEventListener('click', toggle);restart.addEventListener('click', reset);
       cleanup.push(() => play.removeEventListener('click', toggle), () => restart.removeEventListener('click', reset));
-      const update = () => { play.textContent = scene.playing ? 'Pause' : 'Play';play.setAttribute('aria-label', scene.playing ? 'Pause scene' : 'Play scene'); };
+      const update = () => {
+        const label = scene.playing ? 'Pause' : 'Play';
+        // Keep the hit target stable between pointerdown and pointerup.
+        if (play.textContent !== label) play.textContent = label;
+        play.setAttribute('aria-label', scene.playing ? 'Pause scene' : 'Play scene');
+      };
       cleanup.push(scene.onUpdate(update));update();transport.append(play, restart);element.append(transport);
       slider = scene.slider(element);
     }

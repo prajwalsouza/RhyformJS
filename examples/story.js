@@ -7,6 +7,7 @@ let scene,
 const source = createStory.toString();
 $("source").textContent = source;
 function update() {
+  $("view-hint").textContent = scene.playing ? "Pause to look around" : "Drag to look around · Play restores the view";
   const index = Math.max(
     0,
     chapters.findLastIndex((c) => scene.currentTime >= c.time),
@@ -24,13 +25,14 @@ function update() {
     );
   }
   const ended = scene.currentTime >= scene.duration;
-  $("play").textContent = scene.playing
+  const playLabel = scene.playing
     ? "Pause story"
     : ended
       ? "Replay story"
       : scene.currentTime === 0
         ? "Begin the story"
         : "Continue story";
+  if ($("play").textContent !== playLabel) $("play").textContent = playLabel;
   $("status").textContent = scene.playing
     ? "Playing"
     : ended
