@@ -38723,10 +38723,12 @@ function createThreeRenderer(host, options2 = {}) {
     options2.description ?? "Three-dimensional mathematical animation"
   );
   host.append(canvas);
-  let width = 1, height = 1, draws = 0, lost = false, disposed = false;
+  let width = 0, height = 0, draws = 0, lost = false, disposed = false;
   function resize() {
-    width = Math.max(1, host.clientWidth);
-    height = Math.max(1, host.clientHeight);
+    const nextWidth = Math.max(1, host.clientWidth), nextHeight = Math.max(1, host.clientHeight);
+    if (nextWidth === width && nextHeight === height) return false;
+    width = nextWidth;
+    height = nextHeight;
     renderer.setSize(width, height, false);
     if (camera.isPerspectiveCamera) camera.aspect = width / height;
     else {
@@ -38736,6 +38738,7 @@ function createThreeRenderer(host, options2 = {}) {
       camera.left = -camera.right;
     }
     camera.updateProjectionMatrix();
+    return true;
   }
   function addObject(object) {
     const asset = object.geometry;
@@ -39063,10 +39066,7 @@ function createScene3D(selector, options2 = {}, assets) {
   });
   const live = installSceneControls(scene);
   const observer = new ResizeObserver(() => {
-    if (!scene.disposed) {
-      renderer.resize();
-      invalidate();
-    }
+    if (!scene.disposed && renderer.resize()) invalidate();
   });
   observer.observe(host);
   scene.canvas = renderer.canvas;

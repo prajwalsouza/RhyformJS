@@ -311,6 +311,12 @@ await test("paused scenes stop drawing and clear/dispose release GPU objects and
   const draws = await p.evaluate(() => s.stats().draws);
   await p.waitForTimeout(120);
   assert.equal(await p.evaluate(() => s.stats().draws), draws);
+  await p.evaluate(() => {document.getElementById('stage').style.width='420px';});
+  await p.waitForFunction(before=>s.stats().draws>before,draws);
+  const resized=await p.evaluate(()=>({width:s.canvas.clientWidth,draws:s.stats().draws}));
+  assert.equal(resized.width,420);
+  await p.waitForTimeout(120);
+  assert.equal(await p.evaluate(()=>s.stats().draws),resized.draws);
   const r = await p.evaluate(() => {
     s.clear();
     const cleared = s.stats().objects;

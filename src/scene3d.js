@@ -127,10 +127,7 @@ export function createScene3D(selector, options = {}, assets) {
   });
   const live = installSceneControls(scene);
   const observer = new ResizeObserver(() => {
-    if (!scene.disposed) {
-      renderer.resize();
-      invalidate();
-    }
+    if (!scene.disposed && renderer.resize()) invalidate();
   });
   observer.observe(host);
   scene.canvas = renderer.canvas;
