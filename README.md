@@ -4,13 +4,13 @@ Small instructions for mathematical animation in the browser. Draw a shape, tran
 
 Inspired by Manim's mathematical storytelling, with browser interaction as a first-class part of the scene.
 
-Version **0.2.0**. See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
+Version **0.2.1**. See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.2.0/rhyform.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.2.1/rhyform.min.js"></script>
 ```
 
-You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.2.0) and serve them locally. Both bundles embed their license notices.
+You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.2.1) and serve them locally. Both bundles embed their license notices.
 
 [Open the motion studies](examples/index.html) for runnable code beside each animation, including SVG imports and equation transforms. [Interactive controls](examples/controls.html) demonstrates live parameters and built-in transport. [The original Pythagoras scene](examples/legacy-pythagoras.html) demonstrates the older fluent API on the updated runtime.
 

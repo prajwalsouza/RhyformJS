@@ -1,6 +1,6 @@
 {
   "name": "rhyform",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Browser-first mathematical animation with direct SVG transforms",
   "scripts": {

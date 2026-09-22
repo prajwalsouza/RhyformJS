@@ -1,6 +1,12 @@
 # Changelog
 
-## v0.2.0
+## v0.2.1
+
+Publishes the 2D update below after fixing a timing race in the audio-scheduling regression test. The initial assertion now runs synchronously with playback startup, then waits for the scheduled event instead of assuming a browser round trip completes before the cue. Animation behavior is unchanged from the v0.2.0 candidate.
+
+The `v0.2.0` tag was already public when a repeated CI run exposed the test race. Its GitHub release was withheld and its tag is preserved unchanged; use `v0.2.1` for this release.
+
+## v0.2.0 (tagged candidate)
 
 A browser-first 2D update with direct SVG import, deterministic playback, equation correspondence, and live parameter controls.
 
@@ -29,7 +35,7 @@ A browser-first 2D update with direct SVG import, deterministic playback, equati
 - Native/generated shape `draw(seconds)` takes duration; legacy line/curve `draw(speed)` retains its drawing-speed argument.
 - `scene.play(index)` still takes an animation index; use `scene.seek(seconds)` for time. Callback side effects are not replayed by scrubbing.
 - The new parameter/live-shape API is reactive. Legacy point/line constructions remain authored snapshots.
-- Pin production imports to `v0.2.0` or an exact commit. Imports from `@main` change when the default branch changes. The existing `v0.1` tag remains available for older consumers.
+- Pin production imports to `v0.2.1` or an exact commit. Imports from `@main` change when the default branch changes. The existing `v0.1` tag remains available for older consumers.
 
 ### Limits
 

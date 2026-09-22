@@ -8100,7 +8100,7 @@ var rhyform = (() => {
   var api = legacy_default(viewX2, svg_exports, installTimeline);
   installShapes(api, viewX2);
   installAssets(api);
-  api.version = "0.2.0";
+  api.version = "0.2.1";
   api.geometry = { parseSVG, fit: fitAsset, prepareMorph };
   var index_default = api;
   return __toCommonJS(index_exports);

@@ -5,6 +5,7 @@ import { resolve, extname } from 'node:path';
 import assert from 'node:assert/strict';
 
 const root = resolve('.');
+const version = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8')).version;
 const server = createServer(async (req, res) => {
   try {
     const path = resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
@@ -39,7 +40,7 @@ await test('single import: geometry, text, and default legacy slider without opt
     rhyform.createText('Hello').show(.1); const slider = rhyform.createSlider(); slider.show(.1);
     s.circle().draw(.1); s.seek(.15);
     return [rhyform.version, typeof MathJax, typeof Potrace, typeof viewX, !!slider.element, document.querySelectorAll('svg').length];
-  }), ['0.2.0','undefined','undefined','undefined',true,1]);
+  }), [version,'undefined','undefined','undefined',true,1]);
 });
 await test('empty scene, invalid duration, and empty curve give deliberate behavior', async () => {
   assert.deepEqual(await run(() => {
@@ -84,12 +85,17 @@ await test('function effects run once during playback and never during seek', as
   await run(() => {s.seek(0);s.seek(.1);}); assert.equal(await run(() => calls),1);
 });
 await test('audio cues begin at their scheduled time and pause with the scene', async () => {
-  await run(() => {
+  const initial = await run(() => {
     window.s=rhyform.scene('#stage'); window.plays=0;window.pauses=0; s.wait(.06);
-    const audio=rhyform.createAudio('unused.mp3');audio.play();audio.element.play=()=>{plays++;return Promise.resolve();};audio.element.pause=()=>{pauses++;};s.play();
+    const audio=rhyform.createAudio('unused.mp3');audio.play();audio.element.play=()=>{plays++;window.playedAt=s.currentTime;return Promise.resolve();};audio.element.pause=()=>{pauses++;};s.play();
+    // Observe the initial state before yielding to browser animation frames.
+    return plays;
   });
-  assert.equal(await run(() => plays),0);await wait(160);assert.equal(await run(() => plays),1);
-  assert.ok(await run(() => {s.pause();return pauses;})>0);
+  assert.equal(initial,0);
+  await page.waitForFunction(()=>plays>0);
+  assert.equal(await run(()=>plays),1);
+  assert.ok(await run(()=>playedAt>=.06));
+  assert.ok(await run(()=>{const before=pauses;s.pause();return pauses>before;}));
 });
 await test('all SVG path commands, inherited transforms and local use references import', async () => {
   assert.equal(await run(() => {
