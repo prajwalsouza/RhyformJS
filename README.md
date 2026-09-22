@@ -4,7 +4,7 @@ Small instructions for mathematical animation in the browser. Draw a shape, tran
 
 Inspired by Manim's mathematical storytelling, with browser interaction as a first-class part of the scene.
 
-Version **0.3.1** includes GPU 3D scenes, parametric surfaces, tag trees, and extruded equations. Paused 3D scenes let readers drag to rotate; Play restores the authored view, with zoom disabled. Start with [A change of sign](examples/story.html), a complete mathematical story, or explore the [3D studies](examples/three.html) and [3D guide](docs/3d.md). See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
+Version **0.3.1** includes GPU 3D scenes, parametric surfaces, tag trees, and extruded equations. Paused 3D scenes let readers drag to rotate; Play restores the authored view, with zoom disabled. Start with [A change of sign](examples/story.html), a complete mathematical story with a dark, full-screen player, bare playback controls, and chapter markers, or explore the [3D studies](examples/three.html) and [3D guide](docs/3d.md). See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.3.1/rhyform.min.js"></script>

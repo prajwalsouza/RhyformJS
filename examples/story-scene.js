@@ -2,9 +2,9 @@
 export async function createStory(stage) {
   const scene = rhyform.scene(stage, {
     dimensions: 3,
-    viewHeight: 8.8,
-    background: "#f8f7f3",
-    camera: { at: [5, 3.5, 9], lookAt: [0, 1.1, 0] },
+    viewHeight: 7.8,
+    background: "#0b1012",
+    camera: { at: [4, 7, 12], lookAt: [0, 0.65, 0] },
     description:
       "A parabola becomes a bowl, then a saddle as one plus sign becomes minus.",
   });
@@ -16,52 +16,53 @@ export async function createStory(stage) {
   const bowl = { type: "heightField", fn: (x, z) => (x * x + z * z) / 3 };
   const saddle = { type: "heightField", fn: (x, z) => (x * x - z * z) / 3 };
   const surface = scene
-    .shape({ ...bowl, at: [0, -1.5, 0], color: "#7faea1" })
+    .shape({ ...bowl, at: [0, -0.7, 0], color: "#28594f" })
     .tag("story/surface");
-  const parabola = scene.curve((x) => [x, (x * x) / 3 - 1.5, 0], {
+  const parabola = scene.curve((x) => [x, (x * x) / 3 - 0.7, 0], {
     range: [-2, 2],
-    color: "#326e66",
+    color: "#a2ddc3",
     lineWidth: 4,
   });
   const equation = await scene.equation(String.raw`y=\frac{x^2}{3}`, {
-    at: [0, 3.2, -2.5],
-    width: 3.2,
-    depth: 0.07,
-    color: "#315e57",
+    at: [-0.4, 3.6, -1.2],
+    rotation: [-27.89, 16.42, 8.51],
+    width: 1.65,
+    depth: 0.025,
+    color: "#eee9d8",
   });
   equation.tag("story/equation");
   const bowlEquation = await scene.equationDescriptor(
     String.raw`y=\frac{x^2+z^2}{3}`,
-    { width: 4.2 },
+    { width: 2.5, depth: 0.025, color: "#eee9d8" },
   );
   const saddleEquation = await scene.equationDescriptor(
     String.raw`y=\frac{x^2-z^2}{3}`,
-    { width: 4.2 },
+    { width: 2.5, depth: 0.025, color: "#eee9d8" },
   );
   for (let i = 0; i < 9; i++) {
     const z = -2 + i / 2;
     scene
-      .curve((x) => [x, (x * x + z * z) / 3 - 1.5, z], {
+      .curve((x) => [x, (x * x + z * z) / 3 - 0.7, z], {
         range: [-2, 2],
-        color: "#83a89f",
+        color: "#7fbaa7",
         lineWidth: 2,
       })
       .tag("construction/sections/" + i);
   }
-  const across = scene.curve((z) => [0, (z * z) / 3 - 1.48, z], {
+  const across = scene.curve((z) => [0, (z * z) / 3 - 0.68, z], {
     range: [-2, 2],
-    color: "#b77d3f",
+    color: "#e9bc74",
     lineWidth: 4,
   });
-  const along = scene.curve((x) => [x, (x * x) / 3 - 1.48, 0], {
+  const along = scene.curve((x) => [x, (x * x) / 3 - 0.68, 0], {
     range: [-2, 2],
-    color: "#245b53",
+    color: "#b3ebcc",
     lineWidth: 4,
   });
   const downwards = {
     type: "curve",
     range: [-2, 2],
-    fn: (z) => [0, (-z * z) / 3 - 1.48, z],
+    fn: (z) => [0, (-z * z) / 3 - 0.68, z],
   };
 
   chapter(
@@ -101,7 +102,8 @@ export async function createStory(stage) {
   parabola.hide(0.4);
   along.draw(1).startNextImmediately();
   across.draw(1);
-  scene.camera.moveTo([6, 9, 8], 1.5);
+  equation.rotateTo([-34.83, 15.3, 10.41], 1.5).startNextImmediately();
+  scene.camera.moveTo([4, 9, 12], 1.5);
   scene.wait(3);
 
   chapter(
@@ -121,7 +123,8 @@ export async function createStory(stage) {
     "Up in one direction. Down in the other.",
     "The center is no longer a minimum. It is a saddle point: nearby points can lie either above or below it.",
   );
-  scene.camera.moveTo([-6, 3.5, 9], 2.5);
+  equation.rotateTo([-27.89, -16.42, -8.51], 2.5).startNextImmediately();
+  scene.camera.moveTo([-4, 7, 12], 2.5);
   scene.wait(4);
 
   chapter(
@@ -129,7 +132,8 @@ export async function createStory(stage) {
     "One sign changes the shape of space.",
     "A bowl adds the two squared distances. A saddle subtracts one. Same coordinates, a different height rule.",
   );
-  scene.camera.moveTo([5, 3.5, 9], 2.5);
+  equation.rotateTo([-27.89, 16.42, 8.51], 2.5).startNextImmediately();
+  scene.camera.moveTo([4, 7, 12], 2.5);
   scene.wait(5);
   scene.prepare();
   scene.seek(0);

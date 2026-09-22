@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Give “A change of sign” a dark, full-screen presentation with bare playback controls and chapter dots that reveal their titles on hover, focus, or tap.
+- Keep the transcript, source, and rotation guidance in story notes; support dragging from chapter markers to scrub, keyboard navigation, and a text fallback when MathJax cannot load.
+- Check the entire story, responsive framing, chapter navigation, and loading failure behavior. Library bundles remain at v0.3.1.
+
 ## v0.3.1
 
 - Enable drag-to-rotate inspection by default while a 3D scene is paused, including after it ends. Rotation orbits the camera target at a fixed distance; zoom and pan are disabled.

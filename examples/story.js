@@ -3,65 +3,100 @@ import { ensureMathJax } from "./mathjax.js";
 const $ = (id) => document.getElementById(id);
 let scene,
   chapters = [],
-  active = -1;
+  active = -1,
+  peekTimer;
+const chapterButtons = [];
 const source = createStory.toString();
 $("source").textContent = source;
 function update() {
-  $("view-hint").textContent = scene.playing ? "Pause to look around" : "Drag to look around · Play restores the view";
   const index = Math.max(
     0,
     chapters.findLastIndex((c) => scene.currentTime >= c.time),
   );
   if (index !== active) {
     active = index;
-    const chapter = chapters[index];
-    $("chapter-number").textContent =
-      `${String(index + 1).padStart(2, "0")} / ${String(chapters.length).padStart(2, "0")}`;
-    $("chapter-title").textContent = chapter.title;
-    $("sentence").textContent = chapter.text;
-    $("detail").textContent = chapter.detail;
-    [...$("chapters").children].forEach((button, i) =>
-      button.setAttribute("aria-current", String(i === index)),
-    );
+    $("chapter-title").textContent = chapters[index].title;
+    $("sentence").textContent = chapters[index].text;
+    $("detail").textContent = chapters[index].detail;
   }
+  chapterButtons.forEach((button, i) => {
+    button.setAttribute("aria-current", String(i === index));
+    button.dataset.passed = String(scene.currentTime >= chapters[i].time);
+  });
   const ended = scene.currentTime >= scene.duration;
-  const playLabel = scene.playing
+  const label = scene.playing
     ? "Pause story"
     : ended
       ? "Replay story"
       : scene.currentTime === 0
         ? "Begin the story"
         : "Continue story";
-  if ($("play").textContent !== playLabel) $("play").textContent = playLabel;
-  $("status").textContent = scene.playing
+  $("play").setAttribute("aria-label", label);
+  $("play-icon").toggleAttribute("hidden", scene.playing);
+  $("pause-icon").toggleAttribute("hidden", !scene.playing);
+  const status = scene.playing
     ? "Playing"
     : ended
       ? "The end"
       : scene.currentTime > 0
         ? "Paused"
         : "Ready";
-  $("next").disabled = active >= chapters.length - 1;
+  if ($("status").textContent !== status) $("status").textContent = status;
+  $("opening").hidden = index !== 0;
+  $("progress").value = scene.currentTime;
+  $("progress").style.setProperty(
+    "--progress",
+    `${(100 * scene.currentTime) / scene.duration}%`,
+  );
+  $("progress").setAttribute(
+    "aria-valuetext",
+    `${scene.currentTime.toFixed(1)} of ${scene.duration.toFixed(1)} seconds. ${chapters[index].title}`,
+  );
 }
-$("play").addEventListener("click", () =>
+function toggle() {
+  if (!scene) return;
   scene.playing
     ? scene.pause()
     : scene.currentTime >= scene.duration
       ? scene.play()
-      : scene.resume(),
+      : scene.resume();
+}
+$("play").addEventListener("click", toggle);
+$("progress").addEventListener("input", () =>
+  scene?.seek(Number($("progress").value)),
 );
+document.addEventListener("keydown", (event) => {
+  if (
+    event.code !== "Space" ||
+    event.repeat ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    $("notes").open
+  )
+    return;
+  if (event.target !== document.body && event.target !== scene?.canvas) return;
+  event.preventDefault();
+  toggle();
+});
+$("notes-toggle").addEventListener("click", () => {
+  scene?.pause();
+  $("notes").showModal();
+});
+$("notes-close").addEventListener("click", () => $("notes").close());
+$("notes").addEventListener("close", () => {
+  $("notes-toggle").focus({ preventScroll: true });
+});
 $("restart").addEventListener("click", () => {
+  scene.camera.resetView();
   scene.seek(0);
+  $("notes").close();
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) scene.resume();
 });
-$("next").addEventListener("click", () =>
-  scene.seek(chapters[Math.min(active + 1, chapters.length - 1)].time),
-);
 $("source-toggle").addEventListener("click", () => {
   const open = $("source-panel").hidden;
   $("source-panel").hidden = !open;
   $("source-toggle").setAttribute("aria-expanded", String(open));
-  if (open)
-    $("source-panel").scrollIntoView({ block: "start", behavior: "instant" });
 });
 $("copy").addEventListener("click", async () => {
   try {
@@ -74,31 +109,93 @@ $("copy").addEventListener("click", async () => {
 try {
   await ensureMathJax();
   ({ scene, chapters } = await createStory("#stage"));
-  scene.slider("#controls");
   scene.onUpdate(update);
   $("static-story").hidden = true;
+  $("status").className = "sr-only";
+  $("progress").max = scene.duration;
   chapters.forEach((chapter, i) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = `${String(i + 1).padStart(2, "0")} ${chapter.title}`;
-    button.addEventListener("click", () => scene.seek(chapter.time));
+    button.className = "chapter";
+    button.style.setProperty(
+      "--position",
+      `${(100 * chapter.time) / scene.duration}%`,
+    );
+    const name = `${String(i + 1).padStart(2, "0")} · ${chapter.title}`;
+    button.setAttribute("aria-label", name);
+    const tooltip = document.createElement("span");
+    tooltip.className = "chapter-tooltip";
+    tooltip.setAttribute("aria-hidden", "true");
+    tooltip.textContent = name;
+    button.append(tooltip);
+    // A marker remains a chapter button, but dragging from it scrubs the
+    // timeline just like dragging the range thumb underneath it.
+    let pointer,
+      startX,
+      dragged = false;
+    const scrub = (x) => {
+      const rect = $("chapters").getBoundingClientRect();
+      scene.seek(
+        Math.max(0, Math.min(1, (x - rect.left) / rect.width)) * scene.duration,
+      );
+    };
+    button.addEventListener("pointerdown", (event) => {
+      if (!event.isPrimary || event.button !== 0) return;
+      pointer = event.pointerId;
+      startX = event.clientX;
+      dragged = false;
+      button.setPointerCapture(pointer);
+    });
+    button.addEventListener("pointermove", (event) => {
+      if (event.pointerId !== pointer) return;
+      dragged ||= Math.abs(event.clientX - startX) > 3;
+      if (dragged) scrub(event.clientX);
+    });
+    button.addEventListener("pointerup", (event) => {
+      if (event.pointerId !== pointer) return;
+      if (dragged) scrub(event.clientX);
+      pointer = null;
+    });
+    button.addEventListener("lostpointercapture", () => {
+      pointer = null;
+    });
+    button.addEventListener("click", (event) => {
+      if (dragged && event.detail > 0) return;
+      scene.seek(chapter.time);
+      clearTimeout(peekTimer);
+      chapterButtons.forEach((b) => delete b.dataset.peek);
+      button.dataset.peek = "true";
+      peekTimer = setTimeout(() => delete button.dataset.peek, 1800);
+    });
     $("chapters").append(button);
+    chapterButtons.push(button);
     const li = document.createElement("li"),
       strong = document.createElement("strong");
     strong.textContent = chapter.text;
     li.append(strong, document.createTextNode(" " + chapter.detail));
     $("transcript").append(li);
   });
-  $("play").disabled = $("restart").disabled = $("next").disabled = false;
+  $("play").disabled = $("restart").disabled = $("progress").disabled = false;
   $("stage").setAttribute("aria-busy", "false");
   update();
   window.storyScene = scene;
   window.storyChapters = chapters;
-  window.addEventListener("pagehide", () => scene.dispose(), { once: true });
+  window.addEventListener(
+    "pagehide",
+    () => {
+      clearTimeout(peekTimer);
+      scene.dispose();
+    },
+    { once: true },
+  );
 } catch (error) {
   $("error").hidden = false;
-  $("error").textContent = error.message;
+  $("error").textContent =
+    `${error.message}. Open Story notes and code to read the story.`;
+  $("status").className = "sr-only";
   $("status").textContent = "Unable to load";
+  $("opening").hidden = true;
   $("stage").setAttribute("aria-busy", "false");
+  $("notes-toggle").style.opacity = "1";
   scene?.dispose();
 }

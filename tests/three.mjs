@@ -720,11 +720,22 @@ await test("the complete story plays to its ending, reconstructs chapters, and e
       const bounds = (tag) => {
         const o = s.tag(tag).objects[0].snapshot(),
           ys = [];
-        for (let i = 0; i < o.positions.length; i += 3)
-          ys.push(
-            s.project([0, 1, 2].map((k) => o.positions[i + k] + o.position[k]))
-              .y,
+        for (let i = 0; i < o.positions.length; i += 3) {
+          const [x, y, z] = [0, 1, 2].map(
+            (k) => o.positions[i + k] * o.scale[k],
           );
+          const [qx, qy, qz, qw] = o.rotation;
+          const tx = 2 * (qy * z - qz * y),
+            ty = 2 * (qz * x - qx * z),
+            tz = 2 * (qx * y - qy * x);
+          ys.push(
+            s.project([
+              x + qw * tx + qy * tz - qz * ty + o.position[0],
+              y + qw * ty + qz * tx - qx * tz + o.position[1],
+              z + qw * tz + qx * ty - qy * tx + o.position[2],
+            ]).y,
+          );
+        }
         return {
           top: Math.min(...ys),
           bottom: Math.max(...ys),
@@ -772,8 +783,13 @@ await test("the complete story plays to its ending, reconstructs chapters, and e
     null,
     { timeout: 65000 },
   );
-  assert.equal(await p.locator("#play").innerText(), "Replay story");
+  assert.equal(
+    await p.locator("#play").getAttribute("aria-label"),
+    "Replay story",
+  );
   assert.equal(await p.evaluate(() => storyScene.playing), false);
+  await p.locator(".transport").hover();
+  await p.locator("#notes-toggle").click();
   await p.locator("#source-toggle").click();
   assert.equal(await p.locator("#source-panel").isVisible(), true);
   await p.setViewportSize({ width: 390, height: 844 });
@@ -785,6 +801,134 @@ await test("the complete story plays to its ending, reconstructs chapters, and e
   await p.locator("#restart").click();
   assert.equal(await p.evaluate(() => storyScene.playing), false);
   assert.equal(await p.evaluate(() => storyScene.currentTime), 0);
+});
+await test("story controls support chapter seeking, marker dragging, keyboard scrubbing, and notes", async (p) => {
+  await p.goto(base + "/examples/story.html");
+  await p.waitForFunction(() => window.storyScene);
+  assert.equal(await p.locator(".chapter").count(), 7);
+  const chrome = await p.locator(".transport").evaluate((el) => {
+    const s = getComputedStyle(el);
+    return [s.backgroundColor, s.borderTopWidth, s.boxShadow];
+  });
+  assert.deepEqual(chrome, ["rgba(0, 0, 0, 0)", "0px", "none"]);
+  const chapter = p.getByRole("button", { name: "05 · One small change" });
+  await chapter.click();
+  assert.equal(
+    await p.evaluate(() => storyScene.currentTime),
+    await p.evaluate(() => storyChapters[4].time),
+  );
+  assert.equal(await p.evaluate(() => storyScene.playing), false);
+  assert.equal(await chapter.getAttribute("aria-current"), "true");
+  assert.equal(await chapter.locator(".chapter-tooltip").isVisible(), true);
+  const dot = await chapter.boundingBox(),
+    track = await p.locator("#chapters").boundingBox();
+  await p.mouse.move(dot.x + dot.width / 2, dot.y + dot.height / 2);
+  await p.mouse.down();
+  await p.mouse.move(track.x + track.width * 0.9, dot.y + dot.height / 2, {
+    steps: 8,
+  });
+  await p.mouse.up();
+  assert.ok(
+    Math.abs(
+      (await p.evaluate(() => storyScene.currentTime / storyScene.duration)) -
+        0.9,
+    ) < 0.005,
+  );
+  const range = p.locator("#progress");
+  await range.focus();
+  await range.press("Home");
+  assert.equal(await p.evaluate(() => storyScene.currentTime), 0);
+  await range.press("ArrowRight");
+  assert.ok(await p.evaluate(() => storyScene.currentTime > 0));
+  await p.locator("#play").click();
+  assert.equal(
+    await p.locator("#play").getAttribute("aria-label"),
+    "Pause story",
+  );
+  await p.locator("#notes-toggle").click();
+  assert.equal(await p.evaluate(() => storyScene.playing), false);
+  assert.equal(await p.locator("#notes").isVisible(), true);
+  await p.keyboard.press("Escape");
+  assert.equal(await p.locator("#notes").isVisible(), false);
+  await p.waitForFunction(
+    () => document.activeElement === document.getElementById("notes-toggle"),
+  );
+});
+await test("story framing fits portrait and landscape throughout the timeline", async (p) => {
+  for (const [width, height] of [
+    [1440, 900],
+    [1280, 720],
+    [390, 844],
+    [844, 390],
+  ]) {
+    await p.setViewportSize({ width, height });
+    await p.goto(base + "/examples/story.html");
+    await p.waitForFunction(() => window.storyScene);
+    await p.evaluate(() => {
+      const s = storyScene,
+        stage = s.canvas.getBoundingClientRect();
+      const bounds = (tag) => {
+        const o = s.tag(tag).objects[0].snapshot(),
+          points = [];
+        for (let i = 0; i < o.positions.length; i += 3) {
+          const [x, y, z] = [0, 1, 2].map(
+            (k) => o.positions[i + k] * o.scale[k],
+          );
+          const [qx, qy, qz, qw] = o.rotation;
+          const tx = 2 * (qy * z - qz * y),
+            ty = 2 * (qz * x - qx * z),
+            tz = 2 * (qx * y - qy * x);
+          points.push(
+            s.project([
+              x + qw * tx + qy * tz - qz * ty + o.position[0],
+              y + qw * ty + qz * tx - qx * tz + o.position[1],
+              z + qw * tz + qx * ty - qy * tx + o.position[2],
+            ]),
+          );
+        }
+        if (
+          o.opacity > 0 &&
+          points.some(
+            (p) =>
+              p.x < 0 || p.x > stage.width || p.y < 0 || p.y > stage.height,
+          )
+        )
+          throw Error(`${tag} leaves the frame at ${s.currentTime}`);
+        return {
+          top: Math.min(...points.map((p) => p.y)),
+          bottom: Math.max(...points.map((p) => p.y)),
+          opacity: o.opacity,
+        };
+      };
+      for (let time = 0; time <= s.duration; time += 0.5) {
+        s.seek(time);
+        const eq = bounds("story/equation"),
+          surface = bounds("story/surface");
+        if (
+          eq.opacity === 1 &&
+          surface.opacity === 1 &&
+          eq.bottom >= surface.top
+        )
+          throw Error(`Equation overlaps the surface at ${time}`);
+      }
+      if (
+        document.documentElement.scrollWidth > innerWidth ||
+        document.documentElement.scrollHeight > innerHeight
+      )
+        throw Error("The player overflows the viewport");
+    });
+  }
+});
+await test("story still offers its text and source when equation typesetting cannot load", async (p) => {
+  await p.route("**/tex-svg.js", (route) => route.abort());
+  await p.goto(base + "/examples/story.html");
+  await p.waitForFunction(() => !document.getElementById("error").hidden);
+  assert.equal(await p.locator("#play").isDisabled(), true);
+  await p.locator("#notes-toggle").click();
+  assert.equal(await p.locator("#static-story").isVisible(), true);
+  assert.match(await p.locator("#static-story").innerText(), /saddle point/);
+  await p.locator("#source-toggle").click();
+  assert.match(await p.locator("#source").innerText(), /createStory/);
 });
 await browser.close();
 await new Promise((r) => server.close(r));
