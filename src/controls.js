@@ -1,4 +1,4 @@
-import { finite } from './svg.js';
+import { finite } from './numeric.js';
 
 export function installSceneControls(scene) {
   const parameters = new Set(), bindings = new Set(), controls = new Set();

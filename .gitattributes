@@ -1,0 +1,6 @@
+# Reproducible browser distributions. Embedded GLSL strings retain upstream whitespace.
+/rhyform.js linguist-generated=true -whitespace
+/rhyform.min.js linguist-generated=true -whitespace
+/rhyform-3d.js linguist-generated=true -whitespace
+/rhyform-3d.min.js linguist-generated=true -whitespace
+/rhyform-3d.module.js linguist-generated=true -whitespace

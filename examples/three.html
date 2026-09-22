@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Describe curves, fill surfaces, gather tagged objects, and give a mathematical idea a third dimension. Working Rhyform code beside each animation.">
+<title>Rhyform · A little more dimension</title>
+<link rel="stylesheet" href="demo.css"><link rel="stylesheet" href="three.css">
+<script defer src="../rhyform-3d.js"></script><script type="module" src="three.js"></script>
+</head><body>
+<header class="masthead"><a class="wordmark" href="./">rhyform<span aria-hidden="true">∿</span></a><span class="edition">Studies in space / 03</span><a class="source-link" href="../docs/3d.md">3D library guide ↗</a></header>
+<main>
+<nav class="section-nav" aria-label="Examples"><a href="./">Motion studies</a><a href="controls.html">Interactive controls</a><a href="three.html" aria-current="page">Three dimensions</a><a href="story.html">A complete story</a></nav>
+<div class="intro"><div><p class="eyebrow">Small instructions. A new dimension.</p><h1>Give an idea room to move.</h1></div><p class="lede">Describe a shape. Tell it where to go.<br>Bring the pieces together, one instruction at a time.</p></div>
+<nav id="families" class="families" aria-label="Kinds of 3D study"></nav>
+<nav id="studies" class="studies" aria-label="Choose a 3D scene"></nav>
+<div class="workbench">
+<section class="code-panel" aria-labelledby="code-heading"><div class="panel-head"><h2 id="code-heading">The instructions</h2><button id="copy" type="button">Copy code</button></div><pre tabindex="0" aria-label="Complete code for this scene"><code id="code"></code></pre><div class="import-note"><span>One import</span><span id="math-dependency" hidden>+ MathJax 3.2.2 · Run equation code in a module</span><code>&lt;script src="rhyform-3d.js"&gt;&lt;/script&gt;</code></div></section>
+<section class="scene-panel" aria-label="3D animation preview"><div class="panel-head"><h2 id="scene-title"></h2><span id="play-state">Ready to play</span></div><div class="stage-wrap"><div id="stage"></div><p class="stage-caption" id="caption"></p></div><div class="transport"><div class="playback"><button class="primary" id="play" type="button">Play scene <span aria-hidden="true">▶</span></button><button id="restart" type="button" aria-label="Restart scene">↺ <span>Restart</span></button></div><div id="controls"></div></div></section>
+</div>
+<div class="study-note"><p id="note"></p><span id="count"></span></div>
+<p id="error" role="alert" hidden></p><span id="announcement" class="sr-only" role="status"></span>
+</main><footer><span>Rhyform / Small instructions, expressive motion.</span><span>Three.js · GPU canvas · One browser import</span></footer>
+</body></html>

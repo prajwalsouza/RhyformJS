@@ -1,18 +1,9 @@
 import svgpath from 'svgpath';
+import { clamp, mix, finite, duration } from './numeric.js';
+export { clamp, mix, finite, duration } from './numeric.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const number = (value, fallback = 0) => value == null || value === '' ? fallback : Number(value);
-export const clamp = value => Math.max(0, Math.min(1, value));
-export const mix = (a, b, t) => a + (b - a) * t;
-export function finite(value, label = 'value') {
-  if (!Number.isFinite(value)) throw new TypeError(`${label} must be finite`);
-  return value;
-}
-export function duration(value) {
-  finite(value, 'duration');
-  if (value < 0) throw new RangeError('duration must be non-negative');
-  return value;
-}
 export const svgElement = name => document.createElementNS(NS, name);
 const commands = segments => segments.map(s => s.join(' ')).join(' ');
 
@@ -254,7 +245,10 @@ export function prepareMorph(source, target, { fallback = 'error' } = {}) {
       if (t === 0) return source;
       if (t === 1) return target;
       if (!compatible) return { paths: [...source.paths.map(p => ({ ...p, opacity: p.opacity * (1 - t) })), ...target.paths.map(p => ({ ...p, opacity: p.opacity * t }))] };
-      return { paths: pairs.map(({ a, b, contours }) => ({ ...a, d: pointsPath(contours.map(c => ({ closed: c.closed, points: c.a.map((p, i) => ({ x: mix(p.x, c.b[i].x, t), y: mix(p.y, c.b[i].y, t) })) }))), fill: colorMix(a.fill, b.fill, t), stroke: colorMix(a.stroke, b.stroke, t), strokeWidth: mix(a.strokeWidth, b.strokeWidth, t), opacity: mix(a.opacity, b.opacity, t), fillOpacity: mix(a.fillOpacity, b.fillOpacity, t), strokeOpacity: mix(a.strokeOpacity, b.strokeOpacity, t) })) };
+      return { paths: pairs.map(({ a, b, contours }) => {
+        const sampled = contours.map(c => ({ closed: c.closed, points: c.a.map((p, i) => ({ x: mix(p.x, c.b[i].x, t), y: mix(p.y, c.b[i].y, t) })) }));
+        return { ...a, contours: sampled, d: pointsPath(sampled), fill: colorMix(a.fill, b.fill, t), stroke: colorMix(a.stroke, b.stroke, t), strokeWidth: mix(a.strokeWidth, b.strokeWidth, t), opacity: mix(a.opacity, b.opacity, t), fillOpacity: mix(a.fillOpacity, b.fillOpacity, t), strokeOpacity: mix(a.strokeOpacity, b.strokeOpacity, t) };
+      }) };
     }
   };
 }

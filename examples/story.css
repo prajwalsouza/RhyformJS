@@ -1,0 +1,230 @@
+body {
+  background: #f8f7f3;
+}
+.masthead,
+main,
+footer {
+  max-width: 1240px;
+  margin-inline: auto;
+}
+.story-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin: 3rem 0 2rem;
+}
+.story-intro h1 {
+  font-size: clamp(2.3rem, 4vw, 3.7rem);
+}
+.story-frame {
+  border-block: 1px solid var(--line, #d9d6cf);
+}
+.scene-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--line, #d9d6cf);
+  font-size: 0.78rem;
+}
+.scene-heading h2 {
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin: 0;
+}
+.scene-heading #status {
+  margin-left: auto;
+  color: #5a6965;
+}
+.scene-heading #chapter-number {
+  font-variant-numeric: tabular-nums;
+  color: #677771;
+}
+#stage {
+  height: clamp(320px, 48vh, 590px);
+  width: 100%;
+}
+.narration {
+  text-align: center;
+  min-height: 128px;
+  padding: 1.2rem 2rem 1.7rem;
+  max-width: 880px;
+  margin: auto;
+}
+.narration h2 {
+  font:
+    400 clamp(1.5rem, 2.4vw, 2.1rem) / 1.25 Georgia,
+    serif;
+  margin: 0 0 0.7rem;
+}
+.narration p {
+  font-size: 0.93rem;
+  line-height: 1.65;
+  max-width: 690px;
+  margin: auto;
+  color: #53635e;
+}
+.story-transport {
+  border-top: 1px solid var(--line, #d9d6cf);
+  padding: 1rem 1.4rem;
+}
+.transport-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.3rem;
+}
+.transport-buttons button {
+  min-height: 42px;
+}
+.transport-buttons #source-toggle {
+  margin-left: auto;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.chapter-list {
+  display: flex;
+  gap: 0.3rem 1.2rem;
+  flex-wrap: wrap;
+  margin: 1.2rem 0 2rem;
+}
+.chapter-list button {
+  font-size: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 2px solid transparent;
+}
+.chapter-list button[aria-current="true"] {
+  border-bottom-color: #2b7267;
+  color: #23695e;
+}
+.transcript {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  border-top: 1px solid var(--line, #d9d6cf);
+  padding: 1rem 0;
+}
+.transcript summary {
+  cursor: pointer;
+}
+.transcript li {
+  padding: 0.5rem 0;
+  max-width: 780px;
+}
+.transcript p {
+  max-width: 850px;
+  color: #53635e;
+}
+#source-panel {
+  border-block: 1px solid var(--line, #d9d6cf);
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+}
+#source-panel[hidden] {
+  display: none;
+}
+.source-heading {
+  display: flex;
+  justify-content: space-between;
+}
+.source-heading h2 {
+  font:
+    1.5rem Georgia,
+    serif;
+}
+#source-panel p {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  max-width: 900px;
+}
+#source-panel pre {
+  font-size: 0.78rem;
+  line-height: 1.7;
+  background: #eeede7;
+  padding: 1.5rem;
+  max-height: 650px;
+  overflow: auto;
+}
+#error {
+  color: #a6362f;
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.72rem;
+  padding-block: 2rem 1rem;
+}
+footer a {
+  color: inherit;
+}
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #257869;
+  outline-offset: 4px;
+}
+@media (max-width: 700px) {
+  .story-intro {
+    display: block;
+    margin: 2rem 0 1.4rem;
+  }
+  .story-intro .lede {
+    font-size: 0.86rem;
+    margin-top: 1rem;
+  }
+  .scene-heading {
+    padding: 1rem 0.4rem;
+    gap: 0.6rem;
+  }
+  .scene-heading #status {
+    font-size: 0.7rem;
+  }
+  #stage {
+    height: 340px;
+  }
+  .narration {
+    padding: 1.2rem 0.6rem;
+    min-height: 155px;
+  }
+  .narration p {
+    font-size: 0.85rem;
+  }
+  .story-transport {
+    padding: 1rem 0.2rem;
+  }
+  .transport-buttons {
+    gap: 0.3rem 0.9rem;
+    font-size: 0.8rem;
+  }
+  .transport-buttons #source-toggle {
+    margin-left: 0;
+  }
+  .chapter-list {
+    gap: 0.2rem 1rem;
+  }
+  footer {
+    display: block;
+    line-height: 1.8;
+  }
+  footer a {
+    display: block;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+/* The shared demo stylesheet positions its stage absolutely inside a workbench.
+   This story has a normal document-flow stage, above its narration. */
+#stage {
+  position: relative;
+  inset: auto;
+  min-height: 0;
+}
+#restart {
+  font-size: 14px;
+  display: inline-block;
+}

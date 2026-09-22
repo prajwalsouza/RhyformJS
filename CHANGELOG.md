@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.3.0
+
+- Add an optional self-contained Three.js distribution (`rhyform-3d.js`, its minified counterpart, and a browser ES module). Existing 2D bundles remain independent of Three.js.
+- Add parametric XYZ curves, sampled surfaces, fills between curves, lofts, revolutions, tubes, ribbons, planar fills with holes, and extrusion.
+- Add precise move/rotate/scale/color instructions, deterministic sample correspondence, hierarchical tag selections, sequential/staggered groups, and curve/surface/cube assembly recipes.
+- Share the animation clock and native parameter/playback controls across SVG and 3D scenes; release scene-owned GPU resources on disposal.
+- Add fourteen runnable 3D studies and a complete seven-chapter story, “A change of sign,” with synchronized equations, narration, chapter navigation, replay, and source.
+- Add extruded MathJax equations, structural equation transitions, filled SVG meshes, and explicit single-contour symbol-to-solid transforms without tracing. MathJax remains an optional separately loaded typesetter.
+- Keep interaction optional: no pointer listeners or picking loop are installed by 3D scenes. Object event handlers, vector export, and arbitrary mesh morphing are not implemented in this version.
+
+
 ## v0.2.1
 
 Publishes the 2D update below after fixing a timing race in the audio-scheduling regression test. The initial assertion now runs synchronously with playback startup, then waits for the scheduled event instead of assuming a browser round trip completes before the cue. Animation behavior is unchanged from the v0.2.0 candidate.

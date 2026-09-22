@@ -16,7 +16,7 @@ export function installAssets(api) {
     });
   }
   async function job(scene, work) {
-    if (!scene?.selectedSpace || scene.disposed) throw new Error('Create a scene and select its space before loading an asset');
+    if ((!scene?.selectedSpace && scene?.dimensions !== 3) || scene.disposed) throw new Error('Create a scene and select its space before loading an asset');
     const epoch = scene.epoch, controller = new AbortController();
     (scene.pendingAssets ||= new Set()).add(controller);
     try {

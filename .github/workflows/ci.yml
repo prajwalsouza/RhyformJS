@@ -22,6 +22,11 @@ jobs:
       - run: npm ci
       - run: npm run check:release
       - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: node tests/geometry3d.mjs
       - run: node tests/run.mjs
         env:
+          TEST_BROWSER: ${{ matrix.browser }}
+      - run: xvfb-run -a node tests/three.mjs
+        env:
+          TEST_HEADED: 1
           TEST_BROWSER: ${{ matrix.browser }}

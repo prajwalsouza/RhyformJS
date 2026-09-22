@@ -23,8 +23,9 @@ for (const file of files) {
 }
 const ignored = execFileSync('git', ['ls-files', '-ci', '--exclude-standard'], { encoding: 'utf8' }).trim();
 assert.equal(ignored, '', 'Ignored files are already tracked');
-for (const file of ['rhyform.js', 'rhyform.min.js']) {
+for (const file of ['rhyform.js', 'rhyform.min.js', 'rhyform-3d.js', 'rhyform-3d.min.js', 'rhyform-3d.module.js']) {
   const bundle = await readFile(file, 'utf8');
+  if (file.includes('-3d')) for (const notice of ['three.js authors', 'Mapbox']) assert.ok(bundle.includes(notice), `${file} is missing ${notice}'s license notice`);
   for (const notice of ['2023 Prajwal DSouza', '2021 Prajwal DSouza', 'Vitaly Puzrin']) assert.ok(bundle.includes(notice), `${file} is missing ${notice}'s license notice`);
 }
 console.log(`Release v${pkg.version}: versions, ${files.length} publication paths, private-content patterns, and embedded notices checked.`);

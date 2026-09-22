@@ -4,13 +4,13 @@ Small instructions for mathematical animation in the browser. Draw a shape, tran
 
 Inspired by Manim's mathematical storytelling, with browser interaction as a first-class part of the scene.
 
-Version **0.2.1**. See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
+Version **0.3.0** adds GPU 3D scenes, parametric surfaces, tag trees, and extruded equations. Start with [A change of sign](examples/story.html), a complete mathematical story, or explore the [3D studies](examples/three.html) and [3D guide](docs/3d.md). See the [release notes and v0.1 migration notes](CHANGELOG.md). For stable production imports, use a version tag instead of `@main`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.2.1/rhyform.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/prajwalsouza/RhyformJS@v0.3.0/rhyform.min.js"></script>
 ```
 
-You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.2.1) and serve them locally. Both bundles embed their license notices.
+You can also [download the versioned browser bundles](https://github.com/prajwalsouza/RhyformJS/releases/tag/v0.3.0) and serve them locally. All bundles embed their license notices. For 3D, use `rhyform-3d.min.js` or the native module `rhyform-3d.module.js`; the smaller `rhyform.min.js` remains 2D-only.
 
 [Open the motion studies](examples/index.html) for runnable code beside each animation, including SVG imports and equation transforms. [Interactive controls](examples/controls.html) demonstrates live parameters and built-in transport. [The original Pythagoras scene](examples/legacy-pythagoras.html) demonstrates the older fluent API on the updated runtime.
 
@@ -39,7 +39,7 @@ Download `rhyform.js` or `rhyform.min.js` and serve it alongside your page. The 
 </script>
 ```
 
-A standalone browser page is supported. This is a browser library, not a DOM-free Node.js renderer. `src/` is modular source for development; the supplied classic script is the distribution entry point. The legacy rendering dependency is **ViewX**, not Vuex; it is now bundled internally.
+A standalone browser page is supported. This is a browser library, not a DOM-free Node.js renderer. `src/` is modular source for development; the supplied bundles are the distribution entry points; the 3D distribution also provides a native browser ES module. The legacy rendering dependency is **ViewX**, not Vuex; it is now bundled internally.
 
 ## Shape instructions
 
@@ -246,7 +246,7 @@ Edit `src/`; `scripts/build.mjs` regenerates both root bundles. The build scopes
 
 CI installs from the lockfile, checks consistent release versions and embedded license notices, verifies that supplied bundles exactly reproduce from source, and runs the browser suite. `check:release` also checks the publication file list for ignored artifacts and common private-content patterns; it complements manual review and is not a comprehensive secret scanner. npm publication is disabled by `private: true`; tagged GitHub releases distribute the browser files.
 
-The repair is a tested 2D baseline, not a claim that every historical consumer or SVG feature works. Three-dimensional geometry/rendering, natural-language interpretation, semantic split/merge, and a general reactive constraint solver are not in this version.
+The 2D baseline does not cover every historical consumer or SVG feature. The optional 3D distribution adds sampled geometry, GPU rendering, and explicit assembly recipes; see its [supported scope and limits](docs/3d.md). Natural-language interpretation, general semantic split/merge, and a reactive constraint solver remain outside this version.
 
 ## License
 

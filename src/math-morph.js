@@ -127,7 +127,7 @@ export function prepareSemanticMorph(source, target) {
   };
   const leaving = left.map((path, i) => ({ path, i })).filter(p => !usedA.has(p.i)).map(({ path, i }) => ({ path, anchor: related(path, a[i], right, b) }));
   const entering = right.map((path, j) => ({ path, j })).filter(p => !usedB.has(p.j)).map(({ path, j }) => ({ path, anchor: related(path, b[j], left, a) }));
-  const scaled = ({ path, anchor }, scale) => ({ ...path, d: svgpath(path.d).matrix([scale, 0, 0, scale, anchor.x * (1 - scale), anchor.y * (1 - scale)]).toString(), strokeWidth: path.strokeWidth * scale });
+  const scaled = ({ path, anchor }, scale) => ({ ...path, contours: path.contours.map(c => ({ ...c, points: c.points.map(p => ({ x: anchor.x + (p.x-anchor.x)*scale, y: anchor.y + (p.y-anchor.y)*scale })) })), d: svgpath(path.d).matrix([scale, 0, 0, scale, anchor.x * (1 - scale), anchor.y * (1 - scale)]).toString(), strokeWidth: path.strokeWidth * scale });
   return {
     strategy: 'semantic-match',
     correspondence: {

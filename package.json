@@ -1,18 +1,24 @@
 {
   "name": "rhyform",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
-  "description": "Browser-first mathematical animation with direct SVG transforms",
+  "type": "module",
+  "description": "Browser-first mathematical animation with SVG and GPU 3D scenes",
   "scripts": {
     "build": "node scripts/build.mjs",
     "check:dist": "node scripts/build.mjs --check",
     "check:release": "node scripts/check-release.mjs && npm run check:dist",
-    "test": "npm run build && node tests/run.mjs",
+    "test": "npm run build && node tests/geometry3d.mjs && node tests/run.mjs && node tests/three.mjs",
+    "test:3d": "node tests/geometry3d.mjs && node tests/three.mjs",
     "demo": "python3 -m http.server 8769 --bind 127.0.0.1"
   },
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
-    "svgpath": "2.6.0"
+    "earcut": "3.0.2",
+    "svgpath": "2.6.0",
+    "three": "0.186.0"
   },
   "devDependencies": {
     "acorn": "8.15.0",

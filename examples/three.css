@@ -1,0 +1,100 @@
+.studies {
+  gap: 0 24px;
+}
+.studies button {
+  font-size: 12px;
+}
+.workbench {
+  min-height: 610px;
+}
+.stage-wrap {
+  min-height: 445px;
+}
+.code-panel pre {
+  max-height: 555px;
+}
+.stage-caption {
+  bottom: 8px;
+  font-size: 14px;
+}
+#stage {
+  min-height: 445px;
+}
+.scene-panel canvas {
+  outline: none;
+}
+.import-note code {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1050px) {
+  .studies {
+    gap: 0 20px;
+  }
+  .studies button {
+    font-size: 11px;
+  }
+  .workbench {
+    grid-template-columns: minmax(0, 43%) minmax(0, 57%);
+  }
+}
+@media (max-width: 700px) {
+  .studies {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 12px;
+  }
+  .studies button {
+    font-size: 11px;
+  }
+  .stage-wrap,
+  #stage {
+    min-height: 350px;
+    height: 350px;
+  }
+  .workbench {
+    min-height: 0;
+  }
+  .code-panel pre {
+    max-height: 440px;
+  }
+  .section-nav {
+    gap: 18px;
+    font-size: 10px;
+  }
+  .lede br {
+    display: none;
+  }
+}
+.families {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--line);
+  padding: 0.2rem 0 0.8rem;
+}
+.families button {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.families button[aria-pressed="true"] {
+  color: var(--accent);
+}
+.studies button[hidden] {
+  display: none;
+}
+.section-nav {
+  flex-wrap: wrap;
+}
+.import-note {
+  flex-wrap: wrap;
+}
+@media (max-width: 700px) {
+  .families {
+    gap: 0.1rem 1.2rem;
+  }
+  .families button {
+    font-size: 0.74rem;
+  }
+  .studies {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An animated 3D story: build a bowl from parabolas, change one sign, and discover a saddle. A complete Rhyform scene with equations, narration, playback, and source.">
+<title>Rhyform · A change of sign</title>
+<link rel="stylesheet" href="demo.css"><link rel="stylesheet" href="story.css">
+<script defer src="../rhyform-3d.js"></script><script type="module" src="story.js"></script>
+</head><body>
+<header class="masthead"><a class="wordmark" href="./">rhyform<span aria-hidden="true">∿</span></a><span class="edition">A story in space / 01</span><a class="source-link" href="three.html">3D studies ↗</a></header>
+<main>
+<div class="story-intro"><div><p class="eyebrow">One equation. Two very different worlds.</p><h1>A change of sign.</h1></div><p class="lede">A small mathematical story.<br>Watch it unfold, or move through it at your own pace.</p></div>
+<section class="story-frame" aria-label="Animated story">
+<div class="scene-heading"><span id="chapter-number">01 / 07</span><h2 id="chapter-title">A question of shape</h2><span id="status" role="status">Typesetting equations…</span></div>
+<div id="stage" aria-busy="true"></div>
+<div class="narration"><h2 id="sentence">How can a bowl become a saddle?</h2><p id="detail">Keep the same grid of points. Change just one sign in the rule that gives them height.</p></div>
+<div class="story-transport"><div class="transport-buttons"><button id="play" class="primary" type="button" disabled>Begin the story</button><button id="restart" type="button" disabled>Restart</button><button id="next" type="button" disabled>Next chapter →</button><button id="source-toggle" type="button" aria-expanded="false" aria-controls="source-panel">Read the code</button></div><div id="controls"></div></div>
+</section>
+<nav id="chapters" class="chapter-list" aria-label="Story chapters"></nav>
+<p id="error" role="alert" hidden></p>
+<details class="transcript"><summary>Read the story without animation</summary><div id="static-story"><p>Begin with the parabola y = x² / 3. Move copies along z and lift each by z² / 3: together they describe the bowl y = (x² + z²) / 3.</p><p>Change the plus to minus. The x-direction still curves upwards, while the z-direction now curves downwards. The surface becomes y = (x² − z²) / 3.</p><p>At the center, nearby points can be above or below the surface height. This is a saddle point, rather than a minimum.</p></div><ol id="transcript"></ol><p>The plot is shifted down by 1.5 display units to make room for the equation. This placement does not change its curvature. Thin highlighted slices sit slightly above the mesh to remain visible.</p></details>
+<section id="source-panel" hidden><div class="source-heading"><h2>The complete scene</h2><button id="copy" type="button">Copy source</button></div><p>Serve the 3D bundle alongside your page, load MathJax SVG output, and call <code>await createStory('#stage')</code>. The page adds chapter text and transport; the scene below builds and animates the geometry.</p><pre tabindex="0"><code id="source"></code></pre></section>
+</main>
+<footer><span>Built with Rhyform · Three.js · MathJax SVG outlines</span><a href="https://prajwalsouza.github.io/experiences/universal-parabolic-constant/universal-parabolic-constant-story.html">Storytelling reference: A story about averages ↗</a></footer>
+</body></html>
