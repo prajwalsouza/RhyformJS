@@ -930,6 +930,31 @@ await test("story still offers its text and source when equation typesetting can
   await p.locator("#source-toggle").click();
   assert.match(await p.locator("#source").innerText(), /createStory/);
 });
+await test("fadeTo holds a partial opacity and hide continues from it", async (p) => {
+  const r = await p.evaluate(() => {
+    const s = rhyform.scene("#stage", { dimensions: 3 }),
+      o = s.sphere();
+    o.show(1);
+    o.fadeTo(0.3, 1);
+    s.wait(1);
+    o.hide(1);
+    const at = (t) => (s.seek(t), o.snapshot().opacity);
+    return { shown: at(1), faded: at(2), held: at(3), hiding: at(3.5), gone: at(4), back: at(1.5) };
+  });
+  assert.equal(r.shown, 1);
+  assert.ok(Math.abs(r.faded - 0.3) < 1e-6);
+  assert.ok(Math.abs(r.held - 0.3) < 1e-6);
+  assert.ok(Math.abs(r.hiding - 0.15) < 1e-6);
+  assert.equal(r.gone, 0);
+  assert.ok(r.back > 0.3 && r.back < 1);
+});
+await test("the invisible-causes essay loads its first scene and labels", async (p) => {
+  await p.goto(base + "/examples/invisible-causes.html");
+  await p.waitForFunction(() => window.storySceneName === "prologue", null, { timeout: 30000 });
+  const beats = await p.evaluate(() => storyBeats.map((b) => b.name));
+  assert.deepEqual(beats, ["title", "caboose", "reveal", "question", "cast"]);
+  assert.ok((await p.locator("#labels .label").count()) > 0);
+});
 await browser.close();
 await new Promise((r) => server.close(r));
 console.log(`${passed} passed, ${failed} failed (${engine}, 3D).`);

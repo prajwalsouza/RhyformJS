@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c1215" />
+    <meta
+      name="description"
+      content="An interactive essay in three dimensions: how astronomers, brewers, guinea-pig breeders and doctors learned to reason from shadows to invisible causes."
+    />
+    <title>Invisible Causes · Rhyform</title>
+    <link rel="stylesheet" href="invisible-causes.css" />
+    <script defer src="../rhyform-3d.js?v=0.3.1-fade"></script>
+    <script type="module" src="invisible-causes.js"></script>
+  </head>
+  <body>
+    <div id="progress-bar" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="wordmark" href="./">rhyform<span aria-hidden="true">∿</span></a>
+      <details class="toc">
+        <summary>Chapters</summary>
+        <nav id="toc" aria-label="Chapters">
+          <a href="#prologue"><span>Prologue</span> Shadows</a>
+          <a href="#legendre"><span>1805</span> The mean is a shadow</a>
+          <a href="#squares"><span>Ch. 2</span> Why square the errors?</a>
+          <a href="#bessel"><span>Ch. 3</span> The missing dimension</a>
+          <a href="#gosset"><span>1908</span> The uncertainty of uncertainty</a>
+          <a href="#galton"><span>1886</span> Ellipses and regression</a>
+          <a href="#wright"><span>1920</span> A map made of arrows</a>
+          <a href="#spearman"><span>1904</span> The weight in the net</a>
+          <a href="#berkson"><span>1946</span> The hospital door</a>
+          <a href="#berkeley"><span>1973</span> The average that pointed the wrong way</a>
+          <a href="#worlds"><span>Ch. 10</span> The chain and the fork</a>
+          <a href="#perrin"><span>1910</span> Many roads to one invisible number</a>
+          <a href="#haavelmo"><span>1943</span> Seeing versus doing</a>
+          <a href="#network"><span>Today</span> Why not just use a neural network?</a>
+          <a href="#finale"><span>Epilogue</span> Some worlds look identical</a>
+        </nav>
+      </details>
+      <div class="watch-group">
+        <label id="voice-row" class="voice"><input id="voice" type="checkbox" /> <span>Narrate aloud</span></label>
+        <button id="watch" type="button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 20 12 7 19.5Z" /></svg>
+          <span id="watch-label">Watch</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside id="dock" aria-label="Three-dimensional illustration" data-loading="true">
+        <div id="stage"></div>
+        <div id="labels" aria-hidden="true"></div>
+        <div class="hud" aria-hidden="true">
+          <p id="hud-kicker"></p>
+          <p id="hud-title"></p>
+        </div>
+        <div class="dock-tools">
+          <span class="hint">When a scene pauses, drag it to look around</span>
+          <button id="replay" type="button">↺ Replay this moment</button>
+        </div>
+        <div id="dock-panel"></div>
+        <p id="stage-error" role="alert" hidden></p>
+        <div class="loader" aria-hidden="true"></div>
+      </aside>
+
+      <article class="script">
+        <!-- ============================================================ PROLOGUE -->
+        <section class="chapter" id="prologue" data-scene="prologue" data-kicker="Prologue" data-title="Shadows">
+          <div class="beat hero" data-beat="title">
+            <p class="eyebrow">An interactive essay in three dimensions</p>
+            <h1>The Statistical Geometry of Invisible Causes</h1>
+            <p class="dek">
+              How an astronomer, a brewer, a guinea-pig breeder, a psychologist and a hospital
+              statistician learned to reason from shadows&thinsp;—&thinsp;and why a perfect fit can still
+              be a perfect illusion.
+            </p>
+            <p class="how">
+              Scroll to read. Each passage moves the scene beside it; when a scene pauses, drag it to
+              look around, and use the sliders where they appear. Or press <b>Watch</b> and let it play
+              like a film.
+            </p>
+          </div>
+          <div class="beat" data-beat="caboose">
+            <p>
+              Picture a man lying in the back of a railway caboose, sometime around 1920, still weak from
+              a serious illness. The car sways and rattles across the American countryside. To pass the
+              time he’s reading a book on quaternions&thinsp;—&thinsp;the strange four-part numbers mathematicians
+              use to describe rotations in three dimensions. Light reading for a train.
+            </p>
+            <p>
+              At some point, as the story is usually told, he puts the book down, takes out a sheet of
+              paper and starts to draw. Not equations. <em>Guinea pigs.</em> A father guinea pig, a
+              mother guinea pig, their offspring&thinsp;—&thinsp;and between them a web of arrows labelled
+              heredity, environment, and chance.
+            </p>
+            <p>
+              His name is Sewall Wright, and we’ll come back to him and his guinea pigs. But first notice
+              what he was trying to do: to see something that can’t be seen. You cannot watch heredity
+              happen. You can only see what it leaves behind.
+            </p>
+          </div>
+          <div class="beat" data-beat="reveal">
+            <p>
+              That is what this whole story is about. On the right is a room with a shape floating in it.
+              Until now you haven’t been allowed to see the shape&thinsp;—&thinsp;only the three shadows it throws on
+              the floor and the walls. Here it is.
+            </p>
+            <p>
+              Almost every tool in modern statistics is a way of reasoning from shadows back to the object
+              that cast them. A scatter plot is a shadow. A bell curve is a shadow. The dashboard in your
+              Monday meeting is a wall covered in shadows. We tend to treat these tools as if they were
+              handed down on stone tablets: eternal, obvious, inevitable. They weren’t. Each was invented
+              by a particular person, stuck on a particular problem, trying to measure something they
+              couldn’t see clearly.
+            </p>
+          </div>
+          <div class="beat" data-beat="question">
+            <p>
+              Here is the tension that runs underneath all of it. The shape is gone again, and we’re
+              facing a single wall. That is a perfectly good shadow. It is also consistent with a great
+              many different shapes.
+            </p>
+            <p class="pull">
+              When a model fits the data we can see&thinsp;—&thinsp;fits it perfectly&thinsp;—&thinsp;what have we actually
+              learned about the causes we can’t see?
+            </p>
+            <p>
+              Does a perfect fit prove the invisible thing is there? The short answer, which took about
+              two hundred years to earn, is no. The long answer is more interesting, because it tells us
+              what <em>would</em> count as evidence.
+            </p>
+          </div>
+          <div class="beat" data-beat="cast">
+            <p>
+              Our route runs through a French mathematician chasing comets, a brewer in Dublin trying to
+              keep a stout tasting the same, a geneticist doodling guinea pigs on a train, a psychologist
+              hunting for “general intelligence,” a statistician at the Mayo Clinic who noticed that a
+              hospital door can manufacture correlations, and a physicist who convinced the world that
+              atoms were real.
+            </p>
+            <p>
+              Along the way we’ll build&thinsp;—&thinsp;in three dimensions, where you can walk around them&thinsp;—&thinsp;the
+              ideas underneath path analysis, structural equation modelling, and every regression you have
+              ever run. Let’s start with the sky.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1805 LEGENDRE -->
+        <section
+          class="chapter"
+          id="legendre"
+          data-scene="legendre"
+          data-kicker="Chapter 1 · Paris, 1805"
+          data-title="The mean is a shadow"
+        >
+          <header class="chapter-head">
+            <p class="kicker">Chapter 1 · Paris, 1805</p>
+            <h2>The mean is a shadow</h2>
+            <p class="who">Adrien-Marie Legendre and the method of least squares</p>
+          </header>
+          <div class="beat" data-beat="comets">
+            <p>
+              In 1805 Adrien-Marie Legendre was working on one of the hard problems of his day: pinning
+              down the orbit of a comet. Astronomers in different cities, on different nights, each
+              recorded where they saw it&thinsp;—&thinsp;and none of the sightings quite agreed. Air shimmers.
+              Lenses have flaws. Clocks drift, and tired observers write down the wrong minute.
+            </p>
+            <p>
+              In the scene, the pale dots are sightings and the green ellipse is a proposed orbit. No
+              ellipse can pass through all of them; the points contradict each other. The red lines are
+              the misses: how far each sighting sits from the path. So what is the true orbit, when your
+              evidence disagrees with itself?
+            </p>
+          </div>
+          <div class="beat" data-beat="least-squares">
+            <p>
+              Legendre’s answer, tucked into an appendix, was the <b>method of least squares</b>. Take
+              every miss and square it&thinsp;—&thinsp;literally, turn each red line into a square&thinsp;—&thinsp;then add up
+              the areas, and choose the orbit that makes the total as small as possible. Watch the ellipse
+              try a slightly different shape: some squares shrink, others swell. The best orbit is the one
+              where no nudge can make the total smaller.
+            </p>
+            <p>
+              Gauss later claimed he’d been using the method since 1795, and a famous priority dispute
+              followed. But Legendre published first, and he explained it in a way that matters for our
+              story. He didn’t present it as a trick of arithmetic. He tied it to something physical: in
+              the simplest case, the least-squares answer is the <em>center of gravity</em> of the
+              observations.
+            </p>
+          </div>
+          <div class="beat" data-beat="weighings">
+            <p>
+              Let’s make that concrete, because the humble average hides a surprising amount of
+              geometry. You weigh an object three times and get <b>1&nbsp;kg, 2&nbsp;kg and 6&nbsp;kg</b>. The usual
+              picture is three dots on a number line.
+            </p>
+            <p>
+              Put those three readings on a plank as equal weights and ask where the fulcrum has to go
+              for the plank to balance. It wobbles, and settles, at 3. The average is a center of
+              gravity. That is Legendre’s physical intuition, and it’s already a hint that the mean is
+              more than “add them up and divide.” But there is a stranger way to look at it.
+            </p>
+          </div>
+          <div class="beat" data-beat="one-point">
+            <p>
+              Instead of three dots in one dimension, treat the whole data set as a <em>single point in
+              three dimensions</em>. The first reading is how far you walk along one axis, the second how far
+              along another, the third how high you climb.
+            </p>
+            <p>
+              Walk it: one step forward, two steps to the side, six rungs up a ladder. You arrive at a
+              single glowing point hanging in the air at (1,&nbsp;2,&nbsp;6). That point <em>is</em> your whole,
+              messy data set. Three readings make one point in this room; a thousand readings make one
+              point in a room with a thousand dimensions. Nobody can picture a thousand dimensions, but
+              the geometry works exactly the same way&thinsp;—&thinsp;which is why it’s worth learning here, where we
+              can walk around.
+            </p>
+          </div>
+          <div class="beat" data-beat="agreement">
+            <p>
+              Now suppose the object has one true weight&thinsp;—&thinsp;call it <i>a</i>&thinsp;—&thinsp;and your scale were
+              perfect. All three readings would come back the same: (<i>a</i>,&nbsp;<i>a</i>,&nbsp;<i>a</i>). Mark
+              every such point: (1,&nbsp;1,&nbsp;1), (2,&nbsp;2,&nbsp;2), (3,&nbsp;3,&nbsp;3)… They form one straight line, the
+              diagonal of the room.
+            </p>
+            <p>
+              Call it the <b class="mint">line of agreement</b>. Anywhere on it, the three readings agree
+              perfectly. Your data point isn’t on it; it floats off to one side, because your measurements
+              disagree. And so “what single number best represents my data?” has turned into a geometric
+              question: <em>which point on the line is closest to my data point?</em>
+            </p>
+          </div>
+          <div class="beat" data-beat="shadow">
+            <p>
+              Shine a light so your data point casts a shadow straight onto the line, meeting it at a
+              right angle. The shadow lands at <b class="sky">(3,&nbsp;3,&nbsp;3)</b>&thinsp;—&thinsp;and 3 is the mean of 1, 2
+              and 6.
+            </p>
+            <p>
+              That isn’t a coincidence. It is what the mean <em>is</em>. Geometrically, the average is the
+              perpendicular projection of your data onto the line of perfect agreement: the shadow of a
+              messy reality on the line of what a single constant could explain. The red segment, from the
+              data down to its shadow, is the part no constant can explain&thinsp;—&thinsp;the leftover errors
+              (−2,&nbsp;−1,&nbsp;+3). It meets the line at a right angle.
+            </p>
+          </div>
+          <div class="beat" data-beat="pythagoras">
+            <p>
+              A right angle means a right triangle, and a right triangle means Pythagoras. The squared
+              length of the data, 1² + 2² + 6² = 41, splits exactly into the squared length of its shadow,
+              3 × 3² = 27, plus the squared length of the miss, 2² + 1² + 3² = 14.
+            </p>
+            <p>
+              This is why squared error is smallest at the mean. Every other point on the line is farther
+              from your data, because the shortest path from a point to a line is the perpendicular one.
+              Least squares isn’t an arithmetic ritual. It’s the question <em>“what is the nearest
+              point?”</em>, asked in a space where every measurement gets its own direction.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              The first three sliders move your readings, and so the glowing point. The last one slides a
+              candidate constant <i>c</i> along the line. The dark wireframe sphere is centered on your data
+              and always passes through <i>c</i>; its size is the error you would make by claiming the true
+              value is <i>c</i>. It can only shrink until it just touches the line&thinsp;—&thinsp;at the place where the
+              connecting segment meets the line at a right angle. Whatever readings you choose, that place
+              is the mean.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ WHY SQUARES -->
+        <section class="chapter" id="squares" data-scene="squares" data-kicker="Chapter 2 · The same room, a different ruler" data-title="Why square the errors?">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 2 · The same room, a different ruler</p>
+            <h2>Why square the errors?</h2>
+            <p class="who">Mean, median, and the shape of noise</p>
+          </header>
+          <div class="beat" data-beat="why">
+            <p>
+              Here’s the question every student eventually asks, and deserves a better answer to than they
+              usually get. If my errors are −2, −1 and +3, the textbook says I must square them “so the
+              negatives don’t cancel.” But absolute values stop the cancelling too: 2, 1 and 3. So why is
+              squaring the gold standard?
+            </p>
+            <p>
+              Because squaring isn’t a bookkeeping trick. It is a choice of <em>ruler</em>&thinsp;—&thinsp;a decision
+              about what “close” means&thinsp;—&thinsp;and a different ruler gives a different answer. To see it, take
+              three new readings: <b>0, 0 and 10</b>. Same room, same line of agreement; the data point now
+              sits high up the third axis.
+            </p>
+          </div>
+          <div class="beat" data-beat="sphere">
+            <p>
+              With squared error, “distance” is ordinary straight-line distance, and the set of all points
+              at one distance from your data is a <b class="violet">sphere</b>. So inflate a sphere around the
+              data point and stop the moment it first touches the line of agreement.
+            </p>
+            <p>
+              It kisses the line at <b class="sky">3.33</b>&thinsp;—&thinsp;the mean of 0, 0 and 10. That is least squares,
+              seen as a balloon: the mean is the first point of the line the balloon reaches.
+            </p>
+          </div>
+          <div class="beat" data-beat="diamond">
+            <p>
+              Now change the ruler. Measure distance by adding up <em>absolute</em> differences instead. The
+              set of points at one absolute distance from your data isn’t round any more; it’s a
+              <b class="violet">diamond</b>&thinsp;—&thinsp;an octahedron, with its corners pointing along the axes.
+            </p>
+            <p>
+              Inflate the diamond. Its lowest corner reaches the line first, and it reaches it at
+              <b class="sky">0</b>, the <em>median</em> of 0, 0 and 10. Neither 3.33 nor 0 is an arithmetic
+              mistake. They are correct answers to two different questions. Change how you penalise distance
+              and you change what “closest” means.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              The first slider morphs the ruler smoothly: at <i>p</i> = 1 the ball is a diamond, at 2 a sphere,
+              and as <i>p</i> grows it swells into a cube&thinsp;—&thinsp;the ruler that only cares about your single worst
+              miss, whose closest constant is the midrange. The second slider drags the outlier. Watch how
+              the mean chases it and the median simply doesn’t care.
+            </p>
+          </div>
+          <div class="beat" data-beat="noise">
+            <p>
+              So which ruler is right? That depends on what you believe about the noise. If your errors are
+              independent and follow the classic <b class="sky">bell curve</b>&thinsp;—&thinsp;where huge misses are
+              astronomically rare&thinsp;—&thinsp;then the most likely true value, given your data, is exactly the one that
+              minimises squared error. If instead the errors follow a <b class="coral">Laplace</b> curve, with a
+              sharper peak and fatter tails, so that wild outliers are a normal part of life, the most likely
+              value minimises absolute error.
+            </p>
+            <p>
+              Watch the curves turn into penalties. Taking minus the logarithm of the bell gives a parabola
+              (error²); doing the same to the Laplace curve gives a V (|error|). The penalty isn’t arbitrary.
+              It’s the shape of the noise you assumed, turned upside down.
+            </p>
+          </div>
+          <div class="beat" data-beat="pythagoras-of-noise">
+            <p>
+              And the bell curve gives squares one more gift. Independent sources of noise add like
+              perpendicular arrows: the spread of their sum is the hypotenuse, so <em>variances</em>&thinsp;—&thinsp;squared
+              spreads&thinsp;—&thinsp;simply add. It is Pythagoras again, this time for uncertainty.
+            </p>
+            <p>
+              That is the honest answer. We don’t square because negative numbers are annoying. “So they
+              don’t cancel” explains why a raw sum of errors fails&thinsp;—&thinsp;they always add to zero&thinsp;—&thinsp;but not why
+              squares beat absolute values. We square because of the geometry it buys, and because of the
+              Gaussian assumption that makes that geometry the right one.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ N - 1 -->
+        <section class="chapter" id="bessel" data-scene="bessel" data-kicker="Chapter 3 · Every statistics class, ever" data-title="The missing dimension">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 3 · Every statistics class, ever</p>
+            <h2>The missing dimension</h2>
+            <p class="who">Why the sample variance divides by <i>n</i> − 1</p>
+          </header>
+          <div class="beat" data-beat="locked">
+            <p>
+              While we’re in this room, let’s settle a mystery that haunts every introductory course. To
+              estimate how spread out your data is, you add up the squared residuals&thinsp;—&thinsp;but then, instead of
+              dividing by the number of observations <i>n</i>, the formula makes you divide by <b><i>n</i> − 1</b>.
+              Everyone memorises it. Few people are ever shown why.
+            </p>
+            <p>
+              Go back to (1,&nbsp;2,&nbsp;6) and its shadow (3,&nbsp;3,&nbsp;3). Slide the red miss back to the corner of the room
+              so it starts at zero: the residuals (−2,&nbsp;−1,&nbsp;+3). Because the mean is a center of gravity, the
+              pulls in each direction balance, and the residuals <em>always</em> add up to zero. Tell me the first
+              two, +2 and −3 say, and I can tell you the third: it has to be +1. It isn’t free. It’s locked.
+            </p>
+          </div>
+          <div class="beat" data-beat="plane">
+            <p>
+              Geometrically, “the three residuals add to zero” is the equation of a <b class="mint">plane</b>
+              through the corner of the room, standing exactly perpendicular to the line of agreement. Every
+              residual vector, from every possible data set, lies somewhere on this flat sheet&thinsp;—&thinsp;never above
+              it, never below.
+            </p>
+          </div>
+          <div class="beat" data-beat="cloud">
+            <p>
+              Watch what that does to randomness. Here are 64 independent samples, each of three noisy
+              readings of the same quantity: a fuzzy ball of points hovering around (3,&nbsp;3,&nbsp;3), free to wobble in
+              all three directions.
+            </p>
+            <p>
+              Now center each sample on its own mean. Every point slides along the direction of the diagonal
+              until it hits the plane. The 3D cloud is crushed flat onto a 2D sheet. Nothing was thrown away
+              &thinsp;—&thinsp;each sample still has three residuals&thinsp;—&thinsp;but they can now only vary in two independent directions.
+            </p>
+          </div>
+          <div class="beat" data-beat="spent">
+            <p>
+              That is where the “missing” dimension went. You spent one direction of freedom&thinsp;—&thinsp;the one along the
+              line&thinsp;—&thinsp;on estimating the mean. What’s left for measuring spread are the <b class="sky">two free
+              directions</b> in the plane. With <i>n</i> readings it’s the same story in a bigger room: one direction
+              pays for the mean, <i>n</i> − 1 remain.
+            </p>
+            <p>
+              On average, each free direction carries one σ² worth of squared wobble. So the fair way to turn the
+              total squared residual into “spread per direction” is to divide by the number of directions the
+              residual actually lives in. That’s <i>n</i> − 1. You aren’t losing a data point; you’re paying for the
+              mean with a dimension.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              Draw fresh batches and change the true spread. The faint cloud is the raw samples, the red one the
+              same samples after centering&thinsp;—&thinsp;always flat. The numbers below average over thousands of samples, so
+              you can see the three-versus-two appear.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1908 GOSSET -->
+        <section class="chapter" id="gosset" data-scene="gosset" data-kicker="Chapter 4 · Dublin, 1908" data-title="The uncertainty of uncertainty">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 4 · Dublin, 1908</p>
+            <h2>The uncertainty of uncertainty</h2>
+            <p class="who">William Sealy Gosset, the Guinness brewery, and “Student”</p>
+          </header>
+          <div class="beat" data-beat="brewery">
+            <p>
+              A century after Legendre, the story moves from the heavens to a brewery. William Sealy Gosset
+              was not a professor. He was a chemist at Guinness in Dublin, with a very practical job: keep the
+              stout tasting the same, batch after batch, year after year, even though the barley it’s made from
+              changes with every field, every summer and every harvest.
+            </p>
+            <p>
+              His experiments were small&thinsp;—&thinsp;often just three or four samples of barley extract. Each row in the
+              scene is one such sample of three measurements, around a target value. Statisticians of the day
+              worked with thousands of observations, where you can estimate the noise level and then simply
+              treat that estimate as the truth. Gosset couldn’t.
+            </p>
+          </div>
+          <div class="beat" data-beat="ratio">
+            <p>
+              To ask whether a batch really differs from the target, you compute a ratio: how far the sample
+              mean is from the target, divided by how much noise you think there is&thinsp;—&thinsp;the estimated standard
+              error. With three readings, that denominator is itself wildly unstable.
+            </p>
+            <p>
+              Look at the row where, purely by luck, the three readings happen to agree with each other. Its
+              estimated spread is tiny, so dividing by it makes an ordinary wobble look enormous. A brewer using
+              the usual bell-curve table would declare an anomaly and throw out perfectly good barley. Gosset
+              needed the probability law for the ratio when <em>both</em> the top and the bottom are bouncing
+              around&thinsp;—&thinsp;the uncertainty of his own uncertainty.
+            </p>
+          </div>
+          <div class="beat" data-beat="angle">
+            <p>
+              Here is the most beautiful way to see what he found&thinsp;—&thinsp;a geometric picture R.&nbsp;A. Fisher later
+              used to prove Gosset’s result. Back in the room, put one sample as a point. Its shadow on the line
+              of agreement measures the mean. Its miss measures the spread. The t-statistic is the first divided
+              by the second, scaled&thinsp;—&thinsp;and a ratio of two sides of a right triangle is just an angle.
+            </p>
+            <p>
+              For three readings, <span class="math">t = √2 · cot θ</span>, where θ is the angle between the data
+              point and the line of agreement. <em>Small angle, big t.</em> The test doesn’t care how far away the
+              point is. It only cares which direction it points.
+            </p>
+          </div>
+          <div class="beat" data-beat="cone">
+            <p>
+              So “significant” means “pointing close to the line”: inside a <b class="coral">double cone</b>
+              around the diagonal. Now suppose nothing is going on&thinsp;—&thinsp;the true difference is zero and the noise is
+              the same in every direction. Then the data point is equally likely to point <em>anywhere</em>. Each dot
+              on the sphere is the direction of one such null sample.
+            </p>
+            <p>
+              The false-alarm rate is simply the fraction of the sphere inside the cone&thinsp;—&thinsp;which, by a theorem
+              Archimedes proved about spheres, is 1 − cos θ. For three readings, Student’s threshold of 4.30 makes a
+              cone of 18.2°, and exactly 5% of the sphere falls inside.
+            </p>
+          </div>
+          <div class="beat" data-beat="normal-table">
+            <p>
+              Now do what a pre-Gosset brewer would have done: use the normal table’s famous 1.96. The cone swings
+              open to 35.8°, and suddenly <b class="coral">19% of pure noise</b> looks “significant”&thinsp;—&thinsp;nearly four
+              times the promised rate. Narrow it back to Student’s 4.30 and the promise is kept.
+            </p>
+            <p>
+              That was Gosset’s discovery, in a picture: with tiny samples you must widen your idea of what
+              chance can do. Guinness didn’t allow employees to publish, for fear competitors would learn how
+              scientifically it brewed, so in 1908 he published under a pen name: <b>Student</b>. Every
+              statistics student since has learned “Student’s t-test,” mostly unaware it was invented by a brewer.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              Move the threshold and watch the cone open and close. The percentage is Archimedes’ exact cap
+              area; the count is the dots that actually fall inside.
+            </p>
+          </div>
+          <div class="beat" data-beat="tails">
+            <p>
+              Here is Student’s whole family at once: one curve for each amount of data, from a single degree of
+              freedom at the back to thirty at the front, with the ordinary bell curve in white. With little data
+              the tails are thick&thinsp;—&thinsp;extreme ratios are common because the denominator is so unreliable. As the
+              sample grows, the estimate of the noise settles down and the curves melt into the bell.
+            </p>
+            <p>
+              Legendre gave us the geometry of the best estimate. Gosset gave us an honest account of how wrong
+              it can be. But both were measuring one quantity at a time. The world is made of quantities that
+              push on each other.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1886 GALTON -->
+        <section class="chapter" id="galton" data-scene="galton" data-kicker="Chapter 5 · London, 1886" data-title="Ellipses and regression">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 5 · London, 1886</p>
+            <h2>Ellipses and regression</h2>
+            <p class="who">Francis Galton, and a tool with a dark origin</p>
+          </header>
+          <div class="beat" data-beat="heights">
+            <p>
+              To go from measuring one thing to relating two, we need Francis Galton&thinsp;—&thinsp;and we need to be
+              honest about him. Galton was a gifted and restless scientist, and he was also the founder of
+              eugenics. His statistical work on inheritance was bound up with a programme, which he wrote
+              about openly, to breed a “better” human population. We look at the mathematics here because it
+              outlived its purpose; the purpose itself was a dark chapter of science, and tools forged in it
+              deserve to be handled with that memory.
+            </p>
+            <p>
+              Galton collected the heights of parents and their grown children and plotted them against each
+              other: parents along one axis, children along the other, one dot per family. A cloud.
+            </p>
+          </div>
+          <div class="beat" data-beat="mountain">
+            <p>
+              Galton noticed that if you count how crowded the cloud is in each region and draw contour lines
+              of equal crowding, like the contour lines on a hiking map, they aren’t squares or random blobs.
+              They are <b class="mint">ellipses</b>, nested one inside the other. Raise those contours into a
+              landscape and you get a smooth, stretched mountain: the bivariate normal distribution.
+            </p>
+          </div>
+          <div class="beat" data-beat="tangents">
+            <p>
+              Now look down from above. On each ellipse, find the point where it stands exactly vertical&thinsp;—&thinsp;its
+              farthest reach to the left and to the right. Those tangent points line up, and the line through them
+              is what we now call the <b class="coral">regression line</b>: for each parent height, the average
+              height of their children.
+            </p>
+            <p>
+              It is <em>flatter</em> than the diagonal. Unusually tall parents have tall children, but on average
+              less unusually tall. Galton called it regression toward mediocrity; we say regression toward the
+              mean. The slope of that line is the correlation.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              Change the correlation. A strong link squeezes the mountain into a ridge and tilts the line up to meet
+              the diagonal; no link makes the mountain round and the line lie flat; a negative link swings the
+              ellipses the other way.
+            </p>
+          </div>
+          <div class="beat" data-beat="projection">
+            <p>
+              Here’s the connection back to Legendre. Regression is the same shadow, one dimension up. Take three
+              families. The children’s heights are one point <b class="amber">y</b> in our three-dimensional room;
+              the parents’ heights are another, <b class="sky">x</b>. Every prediction of the form “a constant plus a
+              multiple of the parent’s height” lies on the flat <b>plane</b> spanned by the constant direction
+              (1,&nbsp;1,&nbsp;1) and <b class="sky">x</b>.
+            </p>
+            <p>
+              The least-squares fit is the point on that plane closest to <b class="amber">y</b>: its perpendicular
+              shadow. For the mean we projected onto a line. For simple regression we project onto a plane. For
+              regression with ten predictors, onto an eleven-dimensional flat. The same idea every time.
+            </p>
+          </div>
+          <div class="beat" data-beat="limitation">
+            <p>
+              But notice what the shadow doesn’t tell you. It says tall parents <em>tend</em> to have tall
+              children, and by how much. It says nothing about <em>why</em>&thinsp;—&thinsp;about genes, nutrition, shared
+              homes, or anything that pushes on both. Regression is a tool for prediction. To get from “goes
+              together” to “causes,” someone had to draw a map of the mechanism itself.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1920 WRIGHT -->
+        <section class="chapter" id="wright" data-scene="wright" data-kicker="Chapter 6 · Washington, 1920" data-title="A map made of arrows">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 6 · Washington, 1920</p>
+            <h2>A map made of arrows</h2>
+            <p class="who">Sewall Wright, guinea pigs, and path analysis</p>
+          </header>
+          <div class="beat" data-beat="guinea-pigs">
+            <p>
+              Which brings us back to the man in the caboose. Sewall Wright wasn’t trained as a mathematician, and he
+              wasn’t studying people. He was a geneticist at the U.S. Department of Agriculture, breeding guinea pigs
+              and puzzling over their <em>piebald</em> coats&thinsp;—&thinsp;the patchwork of white and coloured fur.
+            </p>
+            <p>
+              How much of a pup’s pattern came from its parents’ genes? How much from the environment it shared with its
+              littermates in the womb? How much from pure developmental chance as its cells divided? A single
+              correlation between parent and offspring can’t split the resemblance into those buckets. So in his 1920
+              paper Wright drew what he meant, and his diagram really did include little sketches of guinea pigs,
+              with arrows for heredity, environment and chance.
+            </p>
+          </div>
+          <div class="beat" data-beat="path-coefficients">
+            <p>
+              Then he did something radical. He stripped the pictures down to nodes and gave every arrow a number:
+              a <b>path coefficient</b>. Watch the guinea pigs become abstract nodes <b class="amber">X</b>,
+              <b class="sky">M</b> and <b class="mint">Y</b>. Each arrow now says: “if the thing at my tail moves by
+              one unit, the thing at my head moves by this much.”
+            </p>
+            <p>
+              Think of each coefficient as the gain on an amplifier. Send a pulse of one unit out of X. It crosses the
+              first arrow and arrives at M multiplied by <i>a</i>. It crosses the second and arrives at Y multiplied
+              by <i>b</i>. Along a chain, effects <em>multiply</em>: the indirect effect of X on Y is <i>a</i>&thinsp;×&thinsp;<i>b</i>.
+            </p>
+          </div>
+          <div class="beat" data-beat="direct">
+            <p>
+              Add a second route: a direct arrow from X straight to Y, with coefficient <i>c</i>. Now the signal
+              travels both ways at once, and at Y the routes <em>add</em>. The total effect of X on Y is
+              <span class="math">c + a·b</span>. Multiply along paths, add across them&thinsp;—&thinsp;that’s the whole grammar
+              of path analysis, and it turns a biological theory into equations that predict what the observed
+              correlations should be.
+            </p>
+          </div>
+          <div class="beat" data-beat="cancel">
+            <p>
+              Now the profound part. Let <i>a</i> = 1 and <i>b</i> = 1, so the indirect route is a strong +1. And let the
+              direct route be a dampener, <i>c</i> = −1. Total effect: +1 − 1 = 0.
+            </p>
+            <p>
+              Look at the scatter plot underneath. A passive observer who plots X against Y sees a formless cloud and
+              concludes that X does nothing, and throws it out of the analysis. They would be catastrophically wrong.
+              X is doing a great deal; two mechanisms are pushing against each other exactly.
+            </p>
+            <p class="pull">“Nothing changed” and “nothing happened” are not the same statement.</p>
+            <p>
+              Two people shoving with all their strength on opposite sides of a door produce a door that doesn’t move.
+              That is a very different door from one nobody is touching.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              Set the three path coefficients yourself. Arrows turn red when negative and thicken with strength; the
+              scatter plot shows only what an observer would see. Find other settings where strong arrows add up to
+              nothing at all.
+            </p>
+          </div>
+          <div class="beat" data-beat="resistance">
+            <p>
+              Not everyone was pleased. Some statisticians and economists of the day saw an animal breeder straying
+              far outside his field, and resisted the method for years. But Wright had done something new. He wasn’t
+              just summarising data. He was proposing a skeleton for how reality worked beneath the surface, with every
+              arrow a hard, testable assumption, and then asking what the data <em>should</em> look like if the
+              skeleton were true.
+            </p>
+            <p>
+              Guinea pigs, at least, can be seen. What happens when the cause at the center of your diagram is
+              something nobody can see at all?
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1904 SPEARMAN -->
+        <section class="chapter" id="spearman" data-scene="spearman" data-kicker="Chapter 7 · London, 1904" data-title="The weight in the net">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 7 · London, 1904</p>
+            <h2>The weight in the net</h2>
+            <p class="who">Charles Spearman, “general intelligence,” and how to test a ghost</p>
+          </header>
+          <div class="beat" data-beat="manifold">
+            <p>
+              In 1904 the psychologist Charles Spearman was studying schoolchildren’s marks in wildly different
+              things: Classics, French, English, mathematics, the ability to tell two musical pitches apart. He
+              noticed something persistent. Every pair of scores was <em>positively</em> correlated. A child above
+              average in Latin tended to be above average in maths, and even at judging pitch.
+            </p>
+            <p>
+              Each line in the scene is one of those correlations; the thicker, the stronger. Psychologists now call
+              this pattern the <b>positive manifold</b>: all the tests lean the same way.
+            </p>
+          </div>
+          <div class="beat" data-beat="gremlins">
+            <p>
+              Spearman proposed an explanation: a single unobserved common cause pushing all the scores up and down
+              together. He called it <b><i>g</i></b>, general intelligence, and&thinsp;—&thinsp;crucially&thinsp;—&thinsp;he didn’t leave it as
+              a loose idea. He made it a precise mathematical object: every test score is <i>g</i> times a loading, plus
+              noise of its own.
+            </p>
+            <p>
+              But hold on. If I believe invisible gremlins in my garden make my tomatoes grow, I can’t just draw an
+              oval, label it “gremlins,” point arrows at the tomatoes and call it science. Drawing a circle doesn’t
+              make the thing inside it real. So how could you ever find evidence for something you can’t observe?
+            </p>
+          </div>
+          <div class="beat" data-beat="three">
+            <p>
+              The answer is that the invisible thing has to make <em>risky</em> predictions about the visible world.
+              Start with three tests. Three tests give three correlations, and the one-cause model has three unknown
+              loadings, one per arrow. Three equations, three unknowns: you can always solve them. Here, from
+              Spearman’s own numbers, each loading comes straight out of the correlations.
+            </p>
+            <p>
+              Which means three tests can <em>never</em> contradict the theory. There’s no leftover information to
+              check it against. A perfect fit here is a tautology, not a discovery.
+            </p>
+          </div>
+          <div class="beat" data-beat="heywood">
+            <p>
+              Almost never, anyway. Each loading squared, λ², is the share of a test’s variance that it holds in
+              common with <i>g</i>, so it must fit inside a container of size one. Now feed in correlations of .80, .80 and
+              .50. The algebra insists the first test shares <b class="coral">1.28</b> units of variance with <i>g</i>
+              &thinsp;—&thinsp;which leaves −0.28 for its own unique part. A negative variance, the square of something, below zero.
+            </p>
+            <p>
+              This is a <b>Heywood case</b>, and software sometimes produces it with perfectly sensible-looking
+              data. The tempting fix is to force the number to zero so the error message goes away. But the negative
+              variance isn’t a glitch; it’s the geometry of the data saying that <em>this</em> causal story cannot
+              produce <em>these</em> numbers. Try the sliders and see which combinations spill.
+            </p>
+          </div>
+          <div class="beat" data-beat="fourth">
+            <p>
+              Now add a fourth test, and everything changes. Four tests give six correlations, but the one-cause model
+              has only four loadings. Two correlations too many: the theory now makes predictions it could get wrong.
+            </p>
+            <p>
+              Picture a cargo net with four corners, and a heavy, invisible lead weight hanging in its middle. That
+              weight is <i>g</i>. Because every corner is tied to the same weight, the corners can’t pull independently;
+              the tensions are locked in fixed proportions to each other.
+            </p>
+          </div>
+          <div class="beat" data-beat="tetrad">
+            <p>
+              Spearman found the lock. If one hidden cause is behind four tests, then the correlation of tests 1 and 2
+              times that of 3 and 4 must equal the correlation of 1 and 3 times that of 2 and 4 (and of 1 and 4 times 2
+              and 3). The three bars must be the same height. Their difference, the <b>tetrad difference</b>, must be
+              zero.
+            </p>
+            <p>
+              Look at that equation. <i>g</i> isn’t in it. A claim about something no one can see has turned into a strict
+              numerical relationship among things you can hold in your hand. Cover up one correlation and the others
+              tell you what it must be. If real data break that equality, the single-cause theory is dead.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              Change the four loadings: the net sags differently, yet the three bars stay equal, because one weight is
+              doing all the pulling. Then add a second hidden cause that only ties tests 1 and 2 together. The bars
+              come apart, and the theory fails its test.
+            </p>
+          </div>
+          <div class="beat" data-beat="reflective">
+            <p>
+              Modern structural equation models are full of ovals like Spearman’s, labelled “socioeconomic status” or
+              “brand loyalty,” with arrows pointing at boxes of survey questions. Is every oval a real hidden cause? No,
+              and mixing that up is one of the most common traps in applied statistics.
+            </p>
+            <p>
+              What Spearman built is a <b class="coral">reflective</b> model. Think of a room’s temperature: a genuine
+              physical state. The thermometers on the walls merely reflect it. If the temperature rises, every reading
+              rises in response. The arrows point <em>out</em> of the hidden thing. Take one thermometer away and
+              temperature means exactly what it meant before.
+            </p>
+          </div>
+          <div class="beat" data-beat="formative">
+            <p>
+              Now reverse the arrows. A cost-of-living index is computed <em>from</em> rent, food, transport and energy.
+              These aren’t reflections of some invisible “expense substance” radiating from the center of the earth;
+              the cost of living doesn’t cause the rent to rise. Rent rising causes the index to rise. This is a
+              <b class="amber">formative</b>, or composite, model, and if you drop rent from it you have changed what the
+              index means.
+            </p>
+            <p>
+              So drawing an oval and calling it “socioeconomic status” doesn’t endow it with causal power. It might just
+              be a calculator adding up income, education and postcode.
+            </p>
+          </div>
+          <div class="beat" data-beat="method">
+            <p>
+              There’s a subtler trap still, laid out by Donald Campbell and Donald Fiske in 1959. Suppose your instruments
+              agree beautifully&thinsp;—&thinsp;the correlations are high, the tetrads are zero, and you declare the hidden truth
+              isolated. But what if all the thermometers are plugged into the same faulty power supply? They agree not
+              because they measure the same deep reality, but because they share the same mistake.
+            </p>
+            <p>
+              In human data, if three questionnaires all give the same answer, maybe they’ve found a deep trait. Or maybe
+              tired participants ticked “strongly agree” all the way down three similar-looking pages. Campbell and Fiske
+              called it method variance. <b>Reliability is not validity</b>: a wrong measurement, repeated exactly, is
+              perfectly consistent. The pattern in the data is a shadow you still have to explain, not a stamp that
+              certifies whatever name you gave the oval.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1946 BERKSON -->
+        <section class="chapter" id="berkson" data-scene="berkson" data-kicker="Chapter 8 · Rochester, Minnesota, 1946" data-title="The hospital door">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 8 · Rochester, Minnesota, 1946</p>
+            <h2>The hospital door</h2>
+            <p class="who">Joseph Berkson and correlations made out of thin air</p>
+          </header>
+          <div class="beat" data-beat="rooms">
+            <p>
+              So far we can isolate invisible causes, draw arrows, and fit models to the data. Now for the unsettling
+              part: the mathematics will tell you exactly what you ask it&thinsp;—&thinsp;even when you’ve asked the wrong question.
+            </p>
+            <p>
+              Joseph Berkson, a statistician at the Mayo Clinic, noticed a problem with studies built only on hospital
+              patients. Let’s rebuild his argument with coins. Imagine a building with four equal rooms. Everyone
+              flips two fair, independent coins, <b>X</b> and <b>Z</b>, and goes to the room that matches: heads–heads,
+              heads–tails, tails–heads, tails–tails. A quarter of the people in each. Knowing someone’s X tells you
+              nothing about their Z.
+            </p>
+          </div>
+          <div class="beat" data-beat="door">
+            <p>
+              Now make the building a hospital, with one admission rule: you get in if <em>either</em> coin came up
+              heads. The tails–tails room is sent home, and the door closes behind them.
+            </p>
+            <p>
+              Nothing about the coins has changed. They are exactly as independent as before. The only thing that has
+              changed is who you are allowed to look at.
+            </p>
+          </div>
+          <div class="beat" data-beat="inside">
+            <p>
+              Walk inside as a researcher and pick a patient at random. Their chart says X came up tails. What can you
+              say about Z? Everything. If they had tails on both they’d have been turned away, so they <em>must</em> have
+              Z heads. Inside the hospital, lacking one trait makes the other a certainty: X and Z have become strongly
+              negatively correlated.
+            </p>
+            <p>
+              The door manufactured a dependency out of thin air. In causal language, admission is a <b>collider</b>
+              &thinsp;—&thinsp;a variable with two causes pointing into it&thinsp;—&thinsp;and selecting on a collider opens a fake connection between
+              its causes.
+            </p>
+          </div>
+          <div class="beat" data-beat="continuous">
+            <p>
+              The same happens with degrees of illness. Here are two diseases whose severities are genuinely unrelated:
+              a round cloud. The hospital admits people whose combined severity crosses a threshold. Everyone below the
+              red wall drops out of view, and among the patients who remain, a clear negative slope appears: the sicker
+              you are with one disease, the less sick you tend to be with the other.
+            </p>
+            <p>
+              Which should make you nervous about the old research habit of “controlling for more variables.”
+              Controlling for&thinsp;—&thinsp;or selecting on&thinsp;—&thinsp;the wrong variable doesn’t remove bias. It can create it.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>Move the admission threshold. Admit everyone and the correlation disappears; admit only the very sick and it grows.</p>
+          </div>
+        </section>
+
+        <!-- ============================================================ 1973 BERKELEY -->
+        <section class="chapter" id="berkeley" data-scene="berkeley" data-kicker="Chapter 9 · Berkeley, 1973" data-title="The average that pointed the wrong way">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 9 · Berkeley, 1973</p>
+            <h2>The average that pointed the wrong way</h2>
+            <p class="who">Bickel, Hammel and O’Connell, and Simpson’s paradox</p>
+          </header>
+          <div class="beat" data-beat="aggregate">
+            <p>
+              In 1973 the graduate admissions figures at the University of California, Berkeley looked damning. Across the
+              whole university, about 44% of men who applied were admitted, against about 35% of women. A large,
+              statistically significant gap, and on a dashboard, two bars that seem to settle the matter.
+            </p>
+            <p>
+              The scene stacks the applicants to Berkeley’s six largest departments as blocks&thinsp;—&thinsp;bright for admitted, dark
+              for rejected. Pooled together, the gap is even wider: 45% of men, 30% of women.
+            </p>
+          </div>
+          <div class="beat" data-beat="departments">
+            <p>
+              Peter Bickel, Eugene Hammel and William O’Connell asked where the decisions were actually made: in the
+              departments. So pull the stacks apart and give each department its own pair of columns.
+            </p>
+            <p>
+              The story flips. In department A, 62% of men were admitted and 82% of women. Across these six, women did
+              as well as or better than men in four, and the two exceptions are small. Every slice of the pie leans one
+              way; the whole pie leans the other. This is <b>Simpson’s paradox</b>.
+            </p>
+          </div>
+          <div class="beat" data-beat="pools">
+            <p>
+              How is that even possible? Look at the heights of the columns: <em>where people applied</em>. Most men applied
+              to A and B, which admitted most applicants. Most women applied to C through F, which rejected most applicants
+              of either sex.
+            </p>
+            <p>
+              The overall rate is a weighted average, and the two groups used completely different weights. It’s like
+              comparing two batting averages when one hitter only ever faced minor-league pitchers and the other faced the
+              best in the world.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>
+              Slide the women’s applications, department by department, toward the pattern men followed, keeping each
+              department’s admission rate for women exactly as it was. Watch the overall gap close, and then reverse.
+            </p>
+          </div>
+          <div class="beat" data-beat="question">
+            <p>
+              Now be careful, because this is where people draw the wrong lesson. It does <em>not</em> prove there was no
+              discrimination. It shows you have to ask a precise causal question. Did admissions committees treat equal
+              applicants unequally at the moment of decision? Adjusting for department answers that&thinsp;—&thinsp;it isolates the red
+              arrow.
+            </p>
+            <p>
+              But why did women apply overwhelmingly to the crowded, underfunded departments in the first place? That’s the
+              path through “department,” and adjusting for department erases it from view. Whether you should control for a
+              variable isn’t a statistical question at all. It depends on which arrows you are trying to measure.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ EQUIVALENCE -->
+        <section class="chapter" id="worlds" data-scene="worlds" data-kicker="Chapter 10 · Two universes" data-title="The chain and the fork">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 10 · Two universes</p>
+            <h2>The chain and the fork</h2>
+            <p class="who">Observational equivalence: when infinite data isn’t enough</p>
+          </header>
+          <div class="beat" data-beat="two-worlds">
+            <p>
+              Fine, you say. Colliders and paradoxes are traps for the careless. Surely a careful researcher with enough
+              clean data will eventually read the true causal structure straight off the numbers?
+            </p>
+            <p>
+              Let’s play at being the creator of two universes. In <b>World A</b>, causes run in a chain: X pushes M, and
+              M pushes Y, like falling dominoes. In <b>World B</b>, M is a puppet master: it pulls X’s strings and Y’s
+              strings at the same time, and X does nothing to anything. Two completely different mechanisms.
+            </p>
+          </div>
+          <div class="beat" data-beat="same-data">
+            <p>
+              Now generate data from each: a billion observations of X, M and Y apiece, perfectly clean. Compute their
+              averages and their covariance matrices. Plotted in three dimensions, they make clouds of exactly the same
+              shape.
+            </p>
+            <p>
+              Not similar. <em>Identical</em>, down to the last decimal place: with the right strengths on the arrows, the
+              chain and the fork produce the very same Gaussian distribution. Give both data sets to the most powerful
+              computer on Earth and it could not tell you which world each came from.
+            </p>
+          </div>
+          <div class="beat" data-beat="perfect-fit">
+            <p>
+              Hand the covariance matrix to structural equation modelling software and propose the chain: it reports a
+              perfect fit. Propose the fork to the same data: perfect fit again. Both worlds agree that once you know M, X
+              and Y have nothing more to say to each other, and that is all passive data can ever reveal here.
+            </p>
+            <p>
+              The data are completely consistent with two contradictory realities. Watching alone can’t decide which way the
+              arrows point. Is causal modelling doomed, then? Only if all we ever do is watch.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ PERRIN -->
+        <section class="chapter" id="perrin" data-scene="perrin" data-kicker="Chapter 11 · Paris, 1908–1913" data-title="Many roads to one invisible number">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 11 · Paris, 1908–1913</p>
+            <h2>Many roads to one invisible number</h2>
+            <p class="who">Jean Perrin, and how atoms became real</p>
+          </header>
+          <div class="beat" data-beat="brownian">
+            <p>
+              The first way out comes from physics. At the start of the twentieth century, some serious scientists still
+              regarded atoms as a convenient fiction for balancing equations rather than real objects with size and mass.
+            </p>
+            <p>
+              Jean Perrin studied <b>Brownian motion</b>: the restless, jittery wandering of tiny grains suspended in water,
+              visible under a microscope. The idea was that the grains are being battered, unevenly, by molecules far too
+              small to see. Each trail in the scene is one grain’s random walk.
+            </p>
+          </div>
+          <div class="beat" data-beat="routes">
+            <p>
+              Perrin’s genius was not to rely on one experiment. He measured how grains settle with height in a column of
+              liquid, how far they wander sideways, how they rotate&thinsp;—&thinsp;and he gathered other physicists’ results from the blue
+              of the sky, black-body radiation, radioactive decay. For each phenomenon, theory gave an equation containing
+              things you could measure and one thing you couldn’t: the number of molecules in a mole, Avogadro’s number.
+            </p>
+            <p>
+              Solve each equation for that hidden number, and the answers landed together, all around six to seven hundred
+              thousand billion billion. It is Spearman’s trick again: a hidden quantity forcing strict agreement among
+              things you can see. If atoms weren’t real, that agreement across utterly different mechanisms would be a
+              miracle. By 1913 the holdouts had been convinced, and in 1926 Perrin received the Nobel Prize.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ HAAVELMO -->
+        <section class="chapter" id="haavelmo" data-scene="haavelmo" data-kicker="Chapter 12 · Chicago, 1943" data-title="Seeing versus doing">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 12 · Chicago, 1943</p>
+            <h2>Seeing versus doing</h2>
+            <p class="who">Trygve Haavelmo, and the wrench</p>
+          </header>
+          <div class="beat" data-beat="market">
+            <p>
+              The second way out is to stop only watching. The Norwegian economist Trygve Haavelmo made the distinction
+              precise in the 1940s, and markets show why it matters. Every day a demand curve and a supply curve cross, and
+              all you ever observe is where they crossed: one price, one quantity. Then tomorrow both curves shift&thinsp;—&thinsp;weather,
+              fashion, costs&thinsp;—&thinsp;and cross somewhere else.
+            </p>
+            <p>
+              Draw a regression line through a year of those crossings and you get a line, sure. But it’s neither the demand
+              curve nor the supply curve. It’s a line through temporary equilibria. It tells you what prices tend to go with
+              what quantities. It does not tell you what would happen if a regulator <em>forced</em> the price to change.
+            </p>
+          </div>
+          <div class="beat" data-beat="wrench">
+            <p>
+              Back to our two worlds. Instead of watching X, reach in with a wrench: disconnect X from whatever normally
+              causes it, and <em>set</em> it to a value. Judea Pearl later wrote this as <b>do(X)</b>.
+            </p>
+            <p>
+              In the chain, you’ve flicked the first domino: M responds, then Y, and the whole cloud slides. In the fork, X was
+              only a puppet. Grab the puppet and pull, and the puppet master M doesn’t notice; Y stays exactly where it was.
+              Two worlds that were identical in every spreadsheet react completely differently to a wrench.
+            </p>
+          </div>
+          <div class="beat" data-beat="see-do">
+            <p class="try">Try it</p>
+            <p>
+              Choose a value for X, then switch between <em>watching</em>&thinsp;—&thinsp;looking only at cases where X happened to be near
+              that value&thinsp;—&thinsp;and <em>reaching in</em> to set it. Watching, the two worlds give the same answer. Reaching in, they part.
+            </p>
+          </div>
+          <div class="beat" data-beat="structural">
+            <p>
+              Conditioning on data and intervening on reality are different mathematical operations. A structural coefficient
+              isn’t a slope through last year’s data; it is a bold claim about what stays stable, and autonomous, when some other
+              part of the system is forced to change. That is far more demanding than a good line of best fit, and far more
+              useful.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ NETWORKS -->
+        <section class="chapter" id="network" data-scene="network" data-kicker="Chapter 13 · Today" data-title="Why not just use a neural network?">
+          <header class="chapter-head">
+            <p class="kicker">Chapter 13 · Today</p>
+            <h2>Why not just use a neural network?</h2>
+            <p class="who">Flexibility is not the same as identification</p>
+          </header>
+          <div class="beat" data-beat="hidden">
+            <p>
+              All this careful machinery&thinsp;—&thinsp;tetrads, colliders, restricted paths&thinsp;—&thinsp;invites an obvious question. Why bother, when
+              a large neural network can swallow a billion data points and learn hidden representations by itself?
+            </p>
+            <p>
+              Look at the simplest network: an input, one hidden layer, an output. The hidden layer is a set of coordinates the
+              network invents. Now rotate those coordinates, and adjust the next layer’s weights to compensate. The output
+              doesn’t move at all. Every rotation is an equally good network. That is <b>rotational indeterminacy</b>: the
+              hidden representation isn’t pinned down by the inputs and outputs.
+            </p>
+          </div>
+          <div class="beat" data-beat="explore">
+            <p class="try">Try it</p>
+            <p>Turn the hidden layer yourself. Whatever you call its axes, the output is untouched.</p>
+          </div>
+          <div class="beat" data-beat="restrict">
+            <p>
+              Put a label like “risk” or “intelligence” on one hidden node and nothing about the network has made that label
+              true. Structural equation models are useful precisely because they take flexibility <em>away</em>: “this indicator
+              measures only this factor” fixes loadings to zero and pins the rotation in place. Restrictions are what produce
+              testable consequences&thinsp;—&thinsp;tetrads that must vanish, variances that must stay positive.
+            </p>
+            <p class="pull">A model that can explain anything explains nothing.</p>
+            <p>
+              Neural networks are superb tools for prediction. But prediction was never the hard part of this story. The hard
+              part was knowing what the arrows mean.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============================================================ FINALE -->
+        <section class="chapter" id="finale" data-scene="finale" data-kicker="Epilogue" data-title="Some worlds look identical until you touch them">
+          <header class="chapter-head">
+            <p class="kicker">Epilogue</p>
+            <h2>Some worlds look identical until you touch them</h2>
+          </header>
+          <div class="beat" data-beat="recap">
+            <p>
+              We started with Legendre in 1805, dropping a perpendicular shadow in a room to find the mean. Gosset, in a
+              brewery, learned to account for the uncertainty of his own uncertainty. Galton saw ellipses in a cloud and a line
+              through their tangents. Wright turned guinea-pig sketches into arrows with numbers, and showed that a correlation
+              of zero can hide two mechanisms at war. Spearman made an invisible cause put its neck on the line, with a tetrad
+              that had to vanish.
+            </p>
+            <p>
+              Then the traps: Berkson’s door, which makes correlations out of nothing; Berkeley’s averages, which point the wrong
+              way; and two worlds, a chain and a fork, that no amount of watching can tell apart. Here are three shadows on a
+              wall. From where we stand, three identical circles.
+            </p>
+          </div>
+          <div class="beat" data-beat="touch">
+            <p>
+              So the next time someone puts a model with a perfect fit index on the screen and says X causes Y, you’ll know what
+              to ask. All data has a geometry, and a model that fits it may be less a window onto reality than a mirror,
+              reflecting the unchallenged assumptions of whoever drew the arrows. The fit was perfect only because the model had
+              never been forced to make a prediction it could get wrong.
+            </p>
+            <p>
+              We don’t learn about the invisible by drawing it. We learn by asking what else would have to be true if it were
+              there&thinsp;—&thinsp;and then, whenever we can, by picking up a wrench and letting the world answer.
+            </p>
+          </div>
+          <div class="beat" data-beat="end">
+            <p class="pull">Some worlds look identical until you touch them.</p>
+            <p class="aside">The scene is paused. Drag it. Touch it.</p>
+          </div>
+        </section>
+
+        <footer class="colophon">
+          <p>
+            Built with <a href="../docs/3d.md">Rhyform 3D</a>, Three.js and MathJax. Each chapter is one Rhyform timeline: SVG
+            guinea pigs, thermometers, a hospital and a wrench are extruded into meshes and morphed into diagram nodes; equations
+            transform into one another; sliders drive live shapes through scene parameters.
+            <a href="invisible-causes-scenes.js">Read the scene source ↗</a>
+          </p>
+          <p>Notes and sources</p>
+          <ul class="sources">
+            <li>A.-M. Legendre, <i>Nouvelles méthodes pour la détermination des orbites des comètes</i> (1805), appendix on least squares.</li>
+            <li>“Student” (W. S. Gosset), “The probable error of a mean,” <i>Biometrika</i> (1908). The cone picture follows R. A. Fisher’s geometric proof.</li>
+            <li>F. Galton, “Regression towards mediocrity in hereditary stature,” <i>J. Anthropological Institute</i> (1886).</li>
+            <li>S. Wright, “The relative importance of heredity and environment in determining the piebald pattern of guinea-pigs,” <i>PNAS</i> (1920); “Correlation and causation” (1921). The caboose anecdote is as retold in J.&nbsp;F. Crow’s writing on Wright.</li>
+            <li>C. Spearman, “‘General intelligence,’ objectively determined and measured,” <i>Am. J. Psychology</i> (1904). Correlations shown are rounded, as commonly reprinted.</li>
+            <li>H. B. Heywood, “On finite sequences of real numbers,” <i>Proc. Royal Society A</i> (1931).</li>
+            <li>D. T. Campbell &amp; D. W. Fiske, “Convergent and discriminant validation by the multitrait–multimethod matrix,” <i>Psychological Bulletin</i> (1959).</li>
+            <li>J. Berkson, “Limitations of the application of fourfold table analysis to hospital data,” <i>Biometrics Bulletin</i> (1946).</li>
+            <li>P. J. Bickel, E. A. Hammel &amp; J. W. O’Connell, “Sex bias in graduate admissions: data from Berkeley,” <i>Science</i> (1975). Six-department figures as published there.</li>
+            <li>J. Perrin, <i>Les Atomes</i> (1913). Values plotted are rounded from his summary table.</li>
+            <li>T. Haavelmo, “The statistical implications of a system of simultaneous equations,” <i>Econometrica</i> (1943); J. Pearl, <i>Causality</i> (2000).</li>
+          </ul>
+        </footer>
+      </article>
+    </main>
+    <noscript><p class="no-script">The 3D scenes need JavaScript, but the essay reads in full without it.</p></noscript>
+  </body>
+</html>

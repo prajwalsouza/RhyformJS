@@ -184,6 +184,7 @@ export function createScene3D(selector, options = {}, assets) {
         plan: { source: this.geometry, target: this.geometry },
         progress: 0,
       };
+      this.targetOpacity = 0;
       this.lastPlan = null;
       this.lastProgress = -1;
       this.sampledDepth = this.geometry.depth;
@@ -248,6 +249,7 @@ export function createScene3D(selector, options = {}, assets) {
     }
     show(value = 0.5) {
       this.assertMutable();
+      this.targetOpacity = 1;
       return this.animate(
         (p) => {
           this.state.opacity = p;
@@ -259,16 +261,38 @@ export function createScene3D(selector, options = {}, assets) {
     }
     hide(value = 0.5) {
       this.assertMutable();
+      // A partially faded object hides from its authored opacity, not from full.
+      const from = this.targetOpacity > 0 ? this.targetOpacity : 1;
+      this.targetOpacity = 0;
       return this.animate(
         (p) => {
-          this.state.opacity = 1 - p;
+          this.state.opacity = from * (1 - p);
         },
         value,
         "Hide",
       );
     }
+    // Fades to a partial opacity, starting from the opacity authored before it.
+    fadeTo(opacity, value = 0.5) {
+      this.assertMutable();
+      finite(opacity, "opacity");
+      if (opacity < 0 || opacity > 1)
+        throw RangeError("opacity must be between zero and one");
+      const from = this.targetOpacity;
+      this.targetOpacity = opacity;
+      const animation = this.animate(
+        (p) => {
+          this.state.opacity = mix(from, opacity, smooth(p));
+          this.state.reveal = 1;
+        },
+        value,
+        "Fade",
+      );
+      return animation;
+    }
     draw(value = 1) {
       this.assertMutable();
+      this.targetOpacity = 1;
       return this.animate(
         (p) => {
           this.state.opacity = p === 0 ? 0 : 1;

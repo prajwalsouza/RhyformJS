@@ -39258,6 +39258,7 @@ void main() {
           plan: { source: this.geometry, target: this.geometry },
           progress: 0
         };
+        this.targetOpacity = 0;
         this.lastPlan = null;
         this.lastProgress = -1;
         this.sampledDepth = this.geometry.depth;
@@ -39316,6 +39317,7 @@ void main() {
       }
       show(value2 = 0.5) {
         this.assertMutable();
+        this.targetOpacity = 1;
         return this.animate(
           (p2) => {
             this.state.opacity = p2;
@@ -39327,16 +39329,37 @@ void main() {
       }
       hide(value2 = 0.5) {
         this.assertMutable();
+        const from = this.targetOpacity > 0 ? this.targetOpacity : 1;
+        this.targetOpacity = 0;
         return this.animate(
           (p2) => {
-            this.state.opacity = 1 - p2;
+            this.state.opacity = from * (1 - p2);
           },
           value2,
           "Hide"
         );
       }
+      // Fades to a partial opacity, starting from the opacity authored before it.
+      fadeTo(opacity, value2 = 0.5) {
+        this.assertMutable();
+        finite(opacity, "opacity");
+        if (opacity < 0 || opacity > 1)
+          throw RangeError("opacity must be between zero and one");
+        const from = this.targetOpacity;
+        this.targetOpacity = opacity;
+        const animation = this.animate(
+          (p2) => {
+            this.state.opacity = mix(from, opacity, smooth(p2));
+            this.state.reveal = 1;
+          },
+          value2,
+          "Fade"
+        );
+        return animation;
+      }
       draw(value2 = 1) {
         this.assertMutable();
+        this.targetOpacity = 1;
         return this.animate(
           (p2) => {
             this.state.opacity = p2 === 0 ? 0 : 1;

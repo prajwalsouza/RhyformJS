@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add “The Statistical Geometry of Invisible Causes,” a scroll-driven essay in fourteen 3D scenes: least squares as projection, mean and median as sphere and diamond, the n − 1 plane, Student’s t as a cone, regression ellipses, path analysis, tetrads and Heywood cases, collider bias, Simpson’s paradox, observational equivalence, and intervention. Each scene has narrated beats, sliders on live shapes, an optional read-aloud Watch mode, and a phone layout.
+- Add `object.fadeTo(opacity, seconds)` for held partial opacity. `hide()` now fades from the authored opacity instead of jumping back to fully opaque at its first frame.
 - Give “A change of sign” a dark, full-screen presentation with bare playback controls and chapter dots that reveal their titles on hover, focus, or tap.
 - Keep the transcript, source, and rotation guidance in story notes; support dragging from chapter markers to scrub, keyboard navigation, and a text fallback when MathJax cannot load.
 - Check the entire story, responsive framing, chapter navigation, and loading failure behavior. Library bundles remain at v0.3.1.
